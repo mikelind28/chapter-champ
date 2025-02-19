@@ -17,16 +17,24 @@
       "title": "The Great Gatsby",
       "authors": ["F. Scott Fitzgerald"],
       "description": "A novel set in the Jazz Age.",
-      "image": "https://example.com/gatsby.jpg",
-      "link": "https://example.com/gatsby"
+      "thumbnail": "https://example.com/gatsby.jpg",
+      "pageCount": 180,
+      "categories": ["Classic", "Fiction"],
+      "averageRating": 4.3,
+      "ratingsCount": 2500,
+      "infoLink": "https://example.com/gatsby"
     },
     {
       "bookId": "2",
       "title": "1984",
       "authors": ["George Orwell"],
-      "description": "A dystopian novel.",
-      "image": "https://example.com/1984.jpg",
-      "link": "https://example.com/1984"
+      "description": "A dystopian novel exploring themes of totalitarianism and surveillance.",
+      "thumbnail": "https://example.com/1984.jpg",
+      "pageCount": 328,
+      "categories": ["Dystopian", "Science Fiction"],
+      "averageRating": 4.6,
+      "ratingsCount": 4200,
+      "infoLink": "https://example.com/1984"
     }
   ]
 }

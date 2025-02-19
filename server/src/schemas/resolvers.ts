@@ -1,67 +1,114 @@
-import { User } from '../models/index.js';
-import { signToken, AuthenticationError } from '../utils/auth.js';
+import { User as UserModel } from "../models/index.js";
+import { signToken, AuthenticationError } from "../utils/auth.js";
+import {
+  searchGoogleBooks,
+  getGoogleBookById,
+} from "../services/bookService.js";
 
 interface User {
-    _id: string;
-    email: string;
-    password: string;
+  _id: string;
+  email: string;
+  password: string;
 }
-  
+
 interface AddUserArgs {
-    input:{
+  input: {
     email: string;
     password: string;
-    }
+  };
 }
-  
+
 interface LoginUserArgs {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 interface Context {
-    user?: User
+  user?: User;
 }
 
 const resolvers = {
-    Query: {
-        // get a user's info
-        me: async (_parent: any, _args: any, context: Context) => {
-            if (context.user) {
-                console.log("Found userId:", context.user._id);
-                return await User.findById(context.user._id).populate('savedBooks');
-            }
-            throw new AuthenticationError('Could not authenticate user.');
-        },
+  Query: {
+    /**
+     * Retrieves the currently authenticated user's information.
+     * @param _parent - Unused parent resolver argument.
+     * @param _args - Unused args resolver argument.
+     * @param context - Context object containing user info.
+     * @returns User data with savedBooks populated.
+     */
+    me: async (_parent: any, _args: any, context: Context) => {
+      if (context.user) {
+        console.log("Found userId:", context.user._id);
+        return await UserModel.findById(context.user._id).populate(
+          "savedBooks"
+        );
+      }
+      throw new AuthenticationError("Could not authenticate user.");
     },
 
-    Mutation: {
-        // add a new user
-        addUser: async (_parent: any, { input }: AddUserArgs): Promise<{ token: string; user: User }> => {
-            const user = await User.create({ ...input });
-            const token = signToken(user.email, user._id);
-            return { token, user };
-        },
-        // log a user in
-        login: async (_parent: any, { email, password }: LoginUserArgs) => {
-            // Find a user with the provided email
-            const user = await User.findOne({ email });
-            // If no user is found, throw an AuthenticationError
-            if (!user) {
-                throw new AuthenticationError("Could not find user with this email.");
-            }
-            // Check if the provided password is correct
-            const correctPw = await user.isCorrectPassword(password);
-            // If the password is incorrect, throw an AuthenticationError
-            if (!correctPw) {
-                throw new AuthenticationError('password authentication failed.');
-            }
-            // Sign a token with the user's information
-            const token = signToken(user.email, user._id);
-            // Return the token and the user
-            return { token, user };
-        },
+    /**
+     * Searches books using the Google Books API.
+     * @param _parent - Unused parent resolver argument.
+     * @param args - Query argument containing the search string.
+     * @returns Array of books matching the search query.
+     */
+    searchGoogleBooks: async (_parent: any, { query }: { query: string }) => {
+      return await searchGoogleBooks(query);
     },
-}
+
+    /**
+     * Retrieves detailed book information by volume ID.
+     * @param _parent - Unused parent resolver argument.
+     * @param args - Argument containing the volume ID.
+     * @returns Detailed book information.
+     */
+    getGoogleBookById: async (
+      _parent: any,
+      { volumeId }: { volumeId: string }
+    ) => {
+      return await getGoogleBookById(volumeId);
+    },
+  },
+
+  Mutation: {
+    /**
+     * Adds a new user and returns an authentication token.
+     * @param _parent - Unused parent resolver argument.
+     * @param input - Object containing email and password.
+     * @returns The user object along with a signed JWT.
+     */
+    addUser: async (
+      _parent: any,
+      { input }: AddUserArgs
+    ): Promise<{ token: string; user: User }> => {
+      if (!input.email || !input.password) {
+        throw new Error("Both email and password are required.");
+      }
+      const user = await UserModel.create({ ...input });
+      const token = signToken(user.email, user._id);
+      return { token, user };
+    },
+
+    /**
+     * Logs a user in and returns a signed authentication token.
+     * @param _parent - Unused parent resolver argument.
+     * @param email - User email.
+     * @param password - User password.
+     * @returns The user object and authentication token.
+     */
+    login: async (_parent: any, { email, password }: LoginUserArgs) => {
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        throw new AuthenticationError("Could not find user with this email.");
+      }
+      const correctPw = await user.isCorrectPassword(password);
+      if (!correctPw) {
+        throw new AuthenticationError("Password authentication failed.");
+      }
+      const token = signToken(user.email, user._id);
+      return { token, user };
+    },
+  },
+};
 
 export default resolvers;
