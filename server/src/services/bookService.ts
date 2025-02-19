@@ -21,9 +21,14 @@ export const searchGoogleBooks = async (query: string, maxResults: number = 10) 
     return response.data.items?.map((book: any) => ({
       id: book.id,
       title: book.volumeInfo.title,
-      authors: book.volumeInfo.authors,
-      description: book.volumeInfo.description,
+      authors: book.volumeInfo.authors || [],
+      description: book.volumeInfo.description || 'No description available.',
       thumbnail: book.volumeInfo.imageLinks?.thumbnail || '',
+      pageCount: book.volumeInfo.pageCount || 0,
+      categories: book.volumeInfo.categories || [],
+      averageRating: book.volumeInfo.averageRating || 0,
+      ratingsCount: book.volumeInfo.ratingsCount || 0,
+      infoLink: book.volumeInfo.infoLink || '',
     })) || [];
   } catch (error) {
     console.error(`Google Books API error: ${error}`);
@@ -46,9 +51,14 @@ export const getGoogleBookById = async (volumeId: string) => {
     return {
       id: book.id,
       title: book.volumeInfo.title,
-      authors: book.volumeInfo.authors,
-      description: book.volumeInfo.description,
+      authors: book.volumeInfo.authors || [],
+      description: book.volumeInfo.description || 'No description available.',
       thumbnail: book.volumeInfo.imageLinks?.thumbnail || '',
+      pageCount: book.volumeInfo.pageCount || 0,
+      categories: book.volumeInfo.categories || [],
+      averageRating: book.volumeInfo.averageRating || 0,
+      ratingsCount: book.volumeInfo.ratingsCount || 0,
+      infoLink: book.volumeInfo.infoLink || '',
     };
   } catch (error) {
     console.error(`Google Books API error: ${error}`);
