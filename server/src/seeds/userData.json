@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "username": "user1",
+      "email": "user1@example.com",
+      "password": "password123"
+    },
+    {
+      "username": "user2",
+      "email": "user2@example.com",
+      "password": "password456"
+    }
+  ],
+  "books": [
+    {
+      "bookId": "1",
+      "title": "The Great Gatsby",
+      "authors": ["F. Scott Fitzgerald"],
+      "description": "A novel set in the Jazz Age.",
+      "image": "https://example.com/gatsby.jpg",
+      "link": "https://example.com/gatsby"
+    },
+    {
+      "bookId": "2",
+      "title": "1984",
+      "authors": ["George Orwell"],
+      "description": "A dystopian novel.",
+      "image": "https://example.com/1984.jpg",
+      "link": "https://example.com/1984"
+    }
+  ]
+}
