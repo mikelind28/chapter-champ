@@ -1,2 +1,0 @@
-declare const typeDefs = "\n    type Book {\n        _id: ID\n    }\n\n    type User {\n        _id: ID\n        email: String\n        password: String\n    }\n\n    type Auth {\n        token: ID!\n        user: User\n    }\n\n\n    input UserInput {\n        email: String!\n        password: String!\n    }\n\n    type Query {\n        me: User\n    }\n\n    type Mutation {\n        addUser(input: UserInput!): Auth\n        login(email: String!, password: String!): Auth\n    }\n";
-export default typeDefs;
