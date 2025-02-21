@@ -5,6 +5,10 @@ import bcrypt from 'bcrypt';
 // Example: import bookSchema from './Book.js';
 // Example: import type { BookDocument } from './Book.js';
 
+import bookSchema from './Book';
+import type { BookDocument } from './Book';
+
+
 export interface UserDocument extends Document {
   id: string;
   username: string;
@@ -14,9 +18,14 @@ export interface UserDocument extends Document {
   // Placeholder: savedBooks field will reference the user's library.
   // Each book will have a status: "Want to Read", "Currently Reading", or "Finished".
   /// Example (future): savedBooks: [{ book details, status }];
-
+  savedBooks: [bookDetails: BookDocument, status: string]
+ 
   // Placeholder: A future virtual property to count books based on their status.
   // Example: totalBooks, currentlyReadingCount, finishedBooksCount, etc.
+  favouriteCount: number;
+  wantToReadCount: number;
+  currentlyReadingCount: number;
+  finishedReadingCount: number;
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -38,6 +47,14 @@ const userSchema = new Schema<UserDocument>(
       required: true,
     },
     // Placeholder: savedBooks field will store the user's library with book status information.
+    savedBooks: [
+      {
+        type: [bookSchema]
+      },
+      {
+        type: String
+      }
+    ]
   },
   {
     toJSON: {
@@ -61,6 +78,22 @@ userSchema.methods.isCorrectPassword = async function (password: string) {
 };
 
 // Placeholder: Future virtual properties for book counts and bingo game progress will be added here.
+userSchema.virtual('favouriteCount').get(function () {
+  return this.favouriteCount;
+});
+
+userSchema.virtual('wantToReadCount').get(function () {
+  return this.wantToReadCount;
+});
+
+userSchema.virtual('currentlyReadingCount').get(function () {
+  return this.currentlyReadingCount;
+});
+
+userSchema.virtual('finishedReadingCount').get(function () {
+  return this.finishedReadingCount;
+});
+
 
 const User = model<UserDocument>('User', userSchema);
 
