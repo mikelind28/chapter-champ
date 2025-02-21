@@ -21,7 +21,7 @@ const generateBingoCard = (books: Book[]) => {
 
 export const BingoCard: React.FC<{ bookArray: Book[] }> = ({ bookArray }) => {
 
-    const [card, setCard] = useState<(Book | "FREE")[][]>(() => generateBingoCard(bookArray));
+    const [card] = useState<(Book | "FREE")[][]>(() => generateBingoCard(bookArray));
     
     const [marked, setMarked] = useState<boolean[][]>(Array(3).fill(null).map(() => Array(3).fill(false)));
 
