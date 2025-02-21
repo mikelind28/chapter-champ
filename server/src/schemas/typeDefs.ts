@@ -47,11 +47,14 @@ type User {
     # Retrieves the current logged-in user
     me: User
 
-    # Placeholder: Retrieve user by ID or username
-    # Example: getSingleUser(id: ID, username: String): User
+    # Retrieve user by ID or username
+    getSingleUser(id: ID, username: String): User
 
     # Search Google Books API with all specified response fields
     searchGoogleBooks(query: String!): [Book]
+
+    # Get Google Books by ID
+    getGoogleBookById(volumeId: String!): Book
   }
 
   type Mutation {
