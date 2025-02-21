@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createTheme, ThemeProvider, CssBaseline} from '@mui/material';
 
-// import './reset.css';
-// import './index.css';
+import './reset.css';
+import './index.css';
 
 import App from './App.tsx';
 import HomePage from "./pages/HomePage";
