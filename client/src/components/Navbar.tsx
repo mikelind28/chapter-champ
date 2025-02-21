@@ -5,19 +5,21 @@ import SignupModal from "./signupModal";
 // Material UI imports
 import { AppBar, Toolbar, Menu, MenuItem, Button, Box, Avatar, TextField } from "@mui/material";
 
+import Auth from '../utils/auth'
 
 interface NavbarProps {
   logo?: string;
   logoSize?: number;
   links?: { label: string; path: string }[];
-  user?: { name: string; avatar?: string } | null;
-  onLogout?: () => void;
-  onLogin: () => void; // Add onLogin prop
+  // user?: { name: string; avatar?: string } | null;
+  // onLogout?: () => void;
+  // onLogin: () => void; // Add onLogin prop
 }
 
-const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [], user, onLogout, onLogin }) => {
+const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const [dashboardMenuEl, setDashboardMenuEl] = useState<null | HTMLElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  // const [loggedIn, setLoggedIn] = useState(false);
  
   const navigate = useNavigate();
 
@@ -27,12 +29,10 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [], user, 
   };
 
   const handleLogout = () => {
-    onLogout && onLogout();
     setDashboardMenuEl(null); // Close menu after
+    Auth.logout();
     navigate("/"); // Redirect to home page
   }
-    
-  
 
   return (
     <AppBar position="static" color="primary">
@@ -50,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [], user, 
           ))}
 
           {/* SHOW DASHBOARD ONLY IF LOGGED IN */}
-          {user && (
+          {Auth.loggedIn() && (
             <>
               <Button 
                 color="inherit"
@@ -75,14 +75,28 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [], user, 
             </>
           )}
 
-          {!user ? (
+          {Auth.loggedIn() && (
+            <>
+              <Button 
+                color="inherit"
+                sx={{ marginRight: 2 }}
+                onClick={handleLogout}
+                aria-haspopup="true"
+              >
+                LOGOUT
+              </Button>
+            </>
+          )}
+
+          {!Auth.loggedIn() ? (
             <Button color="inherit" onClick={() => setModalOpen(true)}>Login/Signup</Button>
           ) : (
-            <Avatar src={user.avatar || undefined} alt={user.name || "User"} sx={{ marginLeft: 0, height: 60, width: 60}} />
+            // <Avatar src={user.avatar || undefined} alt={user.name || "User"} sx={{ marginLeft: 0, height: 60, width: 60}} />
+            <Avatar sx={{ marginLeft: 0, height: 60, width: 60}} />
           )}
         </Box>
       </Toolbar>
-      <SignupModal open={modalOpen} onClose={() => setModalOpen(false)} onLogin={onLogin} />
+      <SignupModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppBar>
   );
 };
