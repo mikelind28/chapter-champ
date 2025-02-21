@@ -1,6 +1,7 @@
 import { signToken } from "../utils/auth.js";
 import { AuthenticationError } from "apollo-server-express";
 import { User as UserModel } from "../models/index.js";
+import { getGoogleBookById } from "../services/bookService.js";
 import fetch from "node-fetch";
 
 interface SearchGoogleBooksArgs {
@@ -31,7 +32,9 @@ const resolvers = {
      */
     me: async (_parent: any, _args: any, context: Context) => {
       if (context.user) {
-        return await UserModel.findById(context.user._id).select("-__v -password");
+        return await UserModel.findById(context.user._id).select(
+          "-__v -password"
+        );
       }
       throw new AuthenticationError("Not logged in");
     },
@@ -43,19 +46,26 @@ const resolvers = {
      * @param {SearchGoogleBooksArgs} args - Search query string.
      * @returns {Promise<Array>} Array of books matching the search query with required fields.
      */
-    searchGoogleBooks: async (_parent: any, { query }: SearchGoogleBooksArgs) => {
+    searchGoogleBooks: async (
+      _parent: any,
+      { query }: SearchGoogleBooksArgs
+    ) => {
       try {
         const response = await fetch(
-          `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`
+          `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
+            query
+          )}`
         );
-        if (!response.ok) throw new Error("Failed to fetch from Google Books API");
+        if (!response.ok)
+          throw new Error("Failed to fetch from Google Books API");
 
         const data = await response.json();
         return data.items.map((item: any) => ({
           id: item.id,
           title: item.volumeInfo.title || "No title available",
           authors: item.volumeInfo.authors || [],
-          description: item.volumeInfo.description || "No description available",
+          description:
+            item.volumeInfo.description || "No description available",
           thumbnail: item.volumeInfo.imageLinks?.thumbnail || "",
           pageCount: item.volumeInfo.pageCount || 0,
           categories: item.volumeInfo.categories || [],
@@ -66,6 +76,26 @@ const resolvers = {
       } catch (err) {
         console.error("Error fetching books:", err);
         throw new Error("Failed to fetch books from Google Books API");
+      }
+    },
+
+    /**
+     * Retrieves detailed book information by volume ID.
+     * @function getGoogleBookById
+     * @param {any} _parent - Unused parent resolver argument.
+     * @param {Object} args - Argument containing the volume ID.
+     * @param {string} args.volumeId - Google Books volume ID.
+     * @returns {Promise<Object>} Detailed book information.
+     */
+    getGoogleBookById: async (
+      _parent: any,
+      { volumeId }: { volumeId: string }
+    ) => {
+      try {
+        return await getGoogleBookById(volumeId);
+      } catch (err) {
+        console.error("Error fetching book by ID:", err);
+        throw new Error("Failed to fetch book details from Google Books API");
       }
     },
   },
@@ -109,7 +139,7 @@ const resolvers = {
      * @returns {Promise<void>} Placeholder for future book-saving logic.
      */
     // saveBook: async (_parent: any, _args: any, _context: Context) => {},
-      // Future implementation placeholder
+    // Future implementation placeholder
 
     /**
      * Placeholder: Future implementation for removing a book from user's library.
@@ -117,7 +147,7 @@ const resolvers = {
      * @returns {Promise<void>} Placeholder for future book-removal logic.
      */
     // removeBook: async (_parent: any, _args: any, _context: Context) => {},
-      // Future implementation placeholder
+    // Future implementation placeholder
   },
 };
 
