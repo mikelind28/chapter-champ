@@ -1,6 +1,5 @@
-import React from "react";
-import { Box, Typography, Button, Grid, Card, CardContent, CardMedia, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, Typography, Grid } from "@mui/material";
+// import { useNavigate } from "react-router-dom";
 import ActionAreaCard from "../components/cards";
 
 const featuredBooks = [
