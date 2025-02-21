@@ -9,7 +9,7 @@ export interface BookDocument extends Document {
     description?: string;
     thumbnail?: string;
     pageCount?: number;
-    categories?: string;
+    categories?: string[];
     averageRating?: number;
     ratingsCount?: number;
     infoLink?: string;
@@ -39,9 +39,11 @@ const bookSchema = new Schema<BookDocument>({
     pageCount: {
         type: Number,
     },
-    categories: {
-        type: String
-    },
+    categories: [
+        {
+            type: String
+        }
+    ],
     averageRating: {
         type: Number
     },
