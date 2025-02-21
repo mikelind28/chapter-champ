@@ -1,64 +1,58 @@
 import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import bookSchema, { BookDocument } from './Book';
 
-// Placeholder: In the future, import the Book schema and related types when the library feature is implemented
-// Example: import bookSchema from './Book.js';
-// Example: import type { BookDocument } from './Book.js';
-
-import bookSchema from './Book';
-import type { BookDocument } from './Book';
-
+// Interface definition for savedBooks with status
+interface SavedBook extends BookDocument {
+  status: 'Want to Read' | 'Currently Reading' | 'Finished Reading' | 'Favorite';
+}
 
 export interface UserDocument extends Document {
   id: string;
   username: string;
   email: string;
   password: string;
+  savedBooks: SavedBook[]; 
   isCorrectPassword(password: string): Promise<boolean>;
-  // Placeholder: savedBooks field will reference the user's library.
-  // Each book will have a status: "Want to Read", "Currently Reading", or "Finished".
-  /// Example (future): savedBooks: [{ book details, status }];
-  savedBooks: [bookDetails: BookDocument, status: string]
- 
-  // Placeholder: A future virtual property to count books based on their status.
-  // Example: totalBooks, currentlyReadingCount, finishedBooksCount, etc.
-  favouriteCount: number;
+  favoriteCount: number;
   wantToReadCount: number;
   currentlyReadingCount: number;
   finishedReadingCount: number;
 }
 
+// User schema with savedBooks including status field
 const userSchema = new Schema<UserDocument>(
   {
     username: {
       type: String,
       required: true,
       unique: true,
-      trim: true, // Trim username for consistency
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
-      match: [/.+@.+\\..+/, 'Must use a valid email address'],
+      match: [/.+@.+\..+/, 'Must use a valid email address'],
     },
     password: {
       type: String,
       required: true,
     },
-    // Placeholder: savedBooks field will store the user's library with book status information.
     savedBooks: [
       {
-        type: [bookSchema]
+        bookDetails: { type: bookSchema, required: true }, 
+        status: {
+          type: String,
+          enum: ['Want to Read', 'Currently Reading', 'Finished Reading', 'Favorite'],
+          default: 'Favorite',
+        },
       },
-      {
-        type: String
-      }
-    ]
+    ],
   },
   {
     toJSON: {
-      virtuals: true, // Virtuals will support future computed fields like book counts.
+      virtuals: true, 
     },
   }
 );
@@ -72,29 +66,27 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Method to compare and validate password for authentication
+// Validate user password during login
 userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
-// Placeholder: Future virtual properties for book counts and bingo game progress will be added here.
-userSchema.virtual('favouriteCount').get(function () {
-  return this.favouriteCount;
+// Virtual property for book counts based on status
+userSchema.virtual('favoriteCount').get(function () {
+  return this.savedBooks.filter((book: SavedBook) => book.status === 'Favorite').length;
 });
 
 userSchema.virtual('wantToReadCount').get(function () {
-  return this.wantToReadCount;
+  return this.savedBooks.filter((book: SavedBook) => book.status === 'Want to Read').length;
 });
 
 userSchema.virtual('currentlyReadingCount').get(function () {
-  return this.currentlyReadingCount;
+  return this.savedBooks.filter((book: SavedBook) => book.status === 'Currently Reading').length;
 });
 
 userSchema.virtual('finishedReadingCount').get(function () {
-  return this.finishedReadingCount;
+  return this.savedBooks.filter((book: SavedBook) => book.status === 'Finished Reading').length;
 });
 
-
 const User = model<UserDocument>('User', userSchema);
-
 export default User;
