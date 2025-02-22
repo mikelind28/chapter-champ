@@ -4,6 +4,9 @@ import {
   getUserById,
   createUser,
   loginUser,
+  saveBookToLibrary,
+  updateBookStatusInLibrary,
+  removeBookFromLibrary,
 } from "../services/userService.js";
 import fetch from "node-fetch";
 
@@ -103,17 +106,43 @@ const resolvers = {
       return await loginUser(email, password);
     },
 
-    /**
-     * Placeholder: Future implementation for saving books to user's library.
+/**
+     * Saves a book to the user's library with the specified reading status.
      * @function saveBook
+     * @param {BookInput} input - The book details input.
+     * @param {string} status - The reading status ("Want to Read", "Currently Reading", etc.).
+     * @returns {Promise<User>} The updated user object with the new book saved.
+     * @throws {AuthenticationError} If the user is not authenticated.
      */
-    // saveBook: async (_parent: any, _args: any, _context: Context) => {},
+saveBook: async (_parent: any, { input, status }: any, context: Context) => {
+  if (!context.user) throw new AuthenticationError("You must be logged in to save a book.");
+  return await saveBookToLibrary(context.user._id, input, status);
+},
 
-    /**
-     * Placeholder: Future implementation for removing a book from user's library.
-     * @function removeBook
-     */
-    // removeBook: async (_parent: any, _args: any, _context: Context) => {},
+/**
+ * Updates the reading status of a saved book in the user's library.
+ * @function updateBookStatus
+ * @param {string} bookId - The ID of the book to update.
+ * @param {string} status - The new reading status.
+ * @returns {Promise<User>} The updated user object after status change.
+ * @throws {AuthenticationError} If the user is not authenticated.
+ */
+updateBookStatus: async (_parent: any, { bookId, status }: any, context: Context) => {
+  if (!context.user) throw new AuthenticationError("You must be logged in to update book status.");
+  return await updateBookStatusInLibrary(context.user._id, bookId, status);
+},
+
+/**
+ * Removes a book from the user's library by its ID.
+ * @function removeBook
+ * @param {string} bookId - The ID of the book to remove.
+ * @returns {Promise<User>} The updated user object after the book removal.
+ * @throws {AuthenticationError} If the user is not authenticated.
+ */
+removeBook: async (_parent: any, { bookId }: any, context: Context) => {
+  if (!context.user) throw new AuthenticationError("You must be logged in to remove a book.");
+  return await removeBookFromLibrary(context.user._id, bookId);
+},
   },
 };
 
