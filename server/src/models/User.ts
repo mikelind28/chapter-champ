@@ -1,6 +1,7 @@
 import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
-import bookSchema, { BookDocument } from './Book';
+import bookSchema, { BookDocument } from './Book.js';
+
 
 // Interface definition for savedBooks with status
 interface SavedBook extends BookDocument {
