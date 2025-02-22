@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { useState } from "react";
+// import { useState } from "react";
 import Navbar from "./components/Navbar";
 import {
   ApolloClient,
@@ -34,18 +34,18 @@ const client = new ApolloClient({
 });
 
 function App() {
-  const [user, setUser] = useState<null | { name: string; avatar?: string }>(null);
+  // const [user, setUser] = useState<null | { name: string; avatar?: string }>(null);
 
-  const handleLogin = () => {
-    setUser({
-      name: "John Doe",
-      avatar: "https://i.pravatar.cc/400",
-    });
-  };
+  // const handleLogin = () => {
+  //   setUser({
+  //     name: "John Doe",
+  //     avatar: "https://i.pravatar.cc/400",
+  //   });
+  // };
 
-  const handleLogout = () => {
-    setUser(null);
-  };
+  // const handleLogout = () => {
+  //   setUser(null);
+  // };
 
   return (
     <ApolloProvider client={client}>
@@ -53,9 +53,9 @@ function App() {
         
         logoSize={100}
         links={[{ label: "Home", path: "/" }]}
-        user={user}
-        onLogout={handleLogout}
-        onLogin={handleLogin}
+        // user={user}
+        // onLogout={handleLogout}
+        // onLogin={handleLogin}
       />
       <Outlet />
     </ApolloProvider>
