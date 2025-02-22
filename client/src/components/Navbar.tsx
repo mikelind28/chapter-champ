@@ -33,6 +33,12 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     Auth.logout();
     navigate("/"); // Redirect to home page
   }
+  if (Auth.loggedIn()) {
+    const user = Auth.getProfile();
+    console.log(user);
+  }
+
+  Auth.isAdmin();
 
   return (
     <AppBar position="static" color="primary">
@@ -50,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
           ))}
 
           {/* SHOW DASHBOARD ONLY IF LOGGED IN */}
-          {Auth.loggedIn() && (
+          {Auth.loggedIn() && !Auth.isAdmin() && (
             <>
               <Button 
                 color="inherit"
@@ -75,6 +81,28 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
             </>
           )}
 
+          {Auth.loggedIn() && Auth.isAdmin() && (
+            <>
+              <Button 
+                color="inherit"
+                sx={{ marginRight: 2 }}
+                onClick={(e) => setDashboardMenuEl(e.currentTarget)}
+                aria-controls={dashboardMenuEl ? "dashboard-menu" : undefined}
+                aria-haspopup="true"
+              >
+                Admin
+              </Button>
+              <Menu
+                id="dashboard-menu"
+                anchorEl={dashboardMenuEl}
+                open={Boolean(dashboardMenuEl)}
+                onClose={() => setDashboardMenuEl(null)}
+              >                
+                <MenuItem onClick={() => handleNavigate("/manageusers")}>Manage Users</MenuItem>
+              </Menu>
+            </>
+          )}
+  
           {Auth.loggedIn() && (
             <>
               <Button 

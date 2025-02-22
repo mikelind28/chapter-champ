@@ -12,6 +12,7 @@ import ShelfPage from "./pages/MyShelfPage";
 import AccountPage from "./pages/AccountPage";
 import Challenges from "./pages/Challenges";
 import Error from './pages/Error.tsx'
+import ManageUsers from './pages/ManageUsers.tsx';
 
 // Material UI Theme
 const theme = createTheme({
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
       { path: "shelf", element: <ShelfPage /> },
       { path: "account", element: <AccountPage /> },
       { path: "challenges", element: <Challenges /> },
+      { path: "manageusers", element: <ManageUsers /> },
     ],
   },
 ]);
