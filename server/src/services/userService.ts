@@ -29,7 +29,7 @@ export const findUserByEmail = async (email: string) => {
  */
 export const createUser = async (username: string, email: string, password: string) => {
   const user = await UserModel.create({ username, email, password });
-  const token = signToken(user.email, user._id);
+  const token = signToken(user.email, user._id, user.isAdmin);
   return { token, user };
 };
 
@@ -52,6 +52,6 @@ export const loginUser = async (email: string, password: string) => {
       throw new AuthenticationError("Wrong password!");
     }
   
-    const token = signToken(user.email, user._id);
+    const token = signToken(user.email, user._id, user.isAdmin);
     return { token, user };
   };
