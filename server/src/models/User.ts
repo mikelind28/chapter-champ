@@ -62,7 +62,7 @@ const userSchema = new Schema<UserDocument>(
   },
   {
     toJSON: {
-      virtuals: true, 
+      virtuals: true,
     },
   }
 );
