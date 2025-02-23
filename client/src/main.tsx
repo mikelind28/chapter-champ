@@ -12,6 +12,11 @@ import ShelfPage from "./pages/MyShelfPage";
 import AccountPage from "./pages/AccountPage";
 import Challenges from "./pages/Challenges";
 import Error from './pages/Error.tsx'
+import ManageUsers from './pages/ManageUsers.tsx';
+import WantToRead from './pages/WantToRead.tsx';
+import CurrentlyReading from './pages/CurrentlyReading.tsx';
+import FinishedReading from './pages/FinishedReading.tsx';
+import Favorites from './pages/Favorites.tsx';
 
 // Material UI Theme
 const theme = createTheme({
@@ -40,6 +45,11 @@ const router = createBrowserRouter([
       { path: "shelf", element: <ShelfPage /> },
       { path: "account", element: <AccountPage /> },
       { path: "challenges", element: <Challenges /> },
+      { path: "manageusers", element: <ManageUsers /> },
+      { path: "want-to-read", element: <WantToRead />},
+      { path: "currently-reading", element: <CurrentlyReading />},
+      { path: "finished-reading", element: <FinishedReading />},
+      { path: "favorites", element: <Favorites />},
     ],
   },
 ]);

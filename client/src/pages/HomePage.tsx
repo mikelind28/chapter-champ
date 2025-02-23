@@ -1,6 +1,8 @@
 import { Box, Typography, Grid } from "@mui/material";
 // import { useNavigate } from "react-router-dom";
-import ActionAreaCard from "../components/cards";
+import ActionAreaCard from "../components/MyShelfCards";
+// import auth from "../utils/auth";
+
 
 const featuredBooks = [
   {
@@ -21,7 +23,6 @@ const featuredBooks = [
 ];
 
 export default function HomePage() {
-  
 
   return (
     <Box  sx={{ textAlign: "center", padding: "20px"}}>

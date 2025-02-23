@@ -31,10 +31,15 @@ export const authenticateToken = ({ req }: any) => {
   return req;
 };
 
-export const signToken = (email: string, _id: unknown) => {
+export const signToken = (email: string, _id: unknown, isAdmin: boolean) => {
   // Create a payload with the user information
+<<<<<<< HEAD
   const payload = { email, _id };
   const secretKey: any = process.env.JWT_SECRET; 
+=======
+  const payload = { email, _id, isAdmin};
+  const secretKey: any = process.env.JWT_SECRET; // Get the secret key from environment variables
+>>>>>>> a0a73ee978bddc70feabf758756d580866b0efe6
 
   // Sign the token with the payload and secret key, and set it to expire in 2 hours
   return jwt.sign({ data: payload }, secretKey, { expiresIn: '2h' });

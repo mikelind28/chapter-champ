@@ -20,12 +20,18 @@ export interface UserDocument extends Document {
   wantToReadCount: number;
   currentlyReadingCount: number;
   finishedReadingCount: number;
+  isAdmin: boolean;
 }
 
 // User schema with savedBooks including status field
 const userSchema = new Schema<UserDocument>(
   {
-    username: { type: String, required: true, unique: true, trim: true },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -33,6 +39,11 @@ const userSchema = new Schema<UserDocument>(
       match: [/.+@.+\..+/, "Must use a valid email address"],
     },
     password: { type: String, required: true },
+    isAdmin: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     savedBooks: [
       {
         bookDetails: { type: bookSchema, required: true },
@@ -49,7 +60,11 @@ const userSchema = new Schema<UserDocument>(
       },
     ],
   },
-  { toJSON: { virtuals: true } }
+  {
+    toJSON: {
+      virtuals: true, 
+    },
+  }
 );
 
 // Hash user password before saving
@@ -61,6 +76,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// Validate user password during login
 // Validate user password during login
 userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);

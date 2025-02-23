@@ -1,6 +1,7 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
+<<<<<<< HEAD
   """
   Enum representing the reading status of a book in the user's library.
   """
@@ -36,6 +37,38 @@ const typeDefs = gql`
     averageRating: Float     # Average rating from Google Books
     ratingsCount: Int        # Total number of ratings
     infoLink: String         # URL to more information about the book
+=======
+  type User {
+    _id: ID!
+    username: String!
+    email: String!
+    # Placeholder: Virtual bookCount for total books in library
+    bookCount: Int
+    # Placeholder: User's personal library with reading status for each book
+    savedBooks: [SavedBook]
+    favoriteCount: Int
+    wantToReadCount: Int
+    currentlyReadingCount: Int
+    finishedReadingCount: Int
+  }
+
+  type BookDetails {
+    id: String!                     
+    title: String!                  
+    authors: [String]               
+    description: String             
+    thumbnail: String               
+    pageCount: Int                  
+    categories: [String]            
+    averageRating: Float            
+    ratingsCount: Int               
+    infoLink: String   
+  }
+
+  type SavedBook {
+    status: String
+    bookDetails: BookDetails          
+>>>>>>> a0a73ee978bddc70feabf758756d580866b0efe6
   }
 
   """
@@ -58,16 +91,17 @@ const typeDefs = gql`
   Input type for adding a book to the user's library.
   """
   input BookInput {
-    id: String!
-    title: String!
-    authors: [String]
-    description: String
-    thumbnail: String
-    pageCount: Int
-    categories: [String]
-    averageRating: Float
-    ratingsCount: Int
-    infoLink: String
+    status: String
+    id: String!                     
+    title: String!                  
+    authors: [String]               
+    description: String             
+    thumbnail: String               
+    pageCount: Int                  
+    categories: [String]            
+    averageRating: Float            
+    ratingsCount: Int               
+    infoLink: String   
   }
 
   """
@@ -80,11 +114,19 @@ const typeDefs = gql`
     # Retrieves a user by ID or username
     getSingleUser(id: ID, username: String): User
 
+<<<<<<< HEAD
     # Searches the Google Books API and returns a list of books
     searchGoogleBooks(query: String!): [Book]
 
     # Retrieves a book by its Google Books API volume ID
     getGoogleBookById(volumeId: String!): Book
+=======
+    # Search Google Books API with all specified response fields
+    searchGoogleBooks(query: String!): [BookDetails]
+
+    # Get Google Books by ID
+    getGoogleBookById(volumeId: String!): BookDetails
+>>>>>>> a0a73ee978bddc70feabf758756d580866b0efe6
   }
 
   """

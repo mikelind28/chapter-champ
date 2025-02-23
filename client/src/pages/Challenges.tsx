@@ -1,7 +1,7 @@
 
 
 import { Grid } from "@mui/material";
-import ActionAreaCard from "../components/cards";
+import ActionAreaCard from "../components/MyShelfCards";
 
 const challengeItems = [
     {
