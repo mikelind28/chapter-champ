@@ -19,7 +19,7 @@ export const authenticateToken = ({ req }: any) => {
 
   // Try to verify the token
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
+    const { data }: any = jwt.verify(token, process.env.JWT_SECRET || '', { maxAge: '2hr' });
     // If the token is valid, attach the user data to the request object
     req.user = data;
   } catch (err) {
@@ -31,10 +31,10 @@ export const authenticateToken = ({ req }: any) => {
   return req;
 };
 
-export const signToken = (email: string, _id: unknown) => {
+export const signToken = (email: string, _id: unknown, isAdmin: boolean) => {
   // Create a payload with the user information
-  const payload = { email, _id };
-  const secretKey: any = process.env.JWT_SECRET_KEY; // Get the secret key from environment variables
+  const payload = { email, _id, isAdmin};
+  const secretKey: any = process.env.JWT_SECRET; // Get the secret key from environment variables
 
   // Sign the token with the payload and secret key, and set it to expire in 2 hours
   return jwt.sign({ data: payload }, secretKey, { expiresIn: '2h' });

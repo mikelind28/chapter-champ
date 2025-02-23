@@ -2,7 +2,6 @@ import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import bookSchema, { BookDocument } from './Book.js';
 
-
 // Interface definition for savedBooks with status
 interface SavedBook extends BookDocument {
   status: 'Want to Read' | 'Currently Reading' | 'Finished Reading' | 'Favorite';
@@ -19,6 +18,7 @@ export interface UserDocument extends Document {
   wantToReadCount: number;
   currentlyReadingCount: number;
   finishedReadingCount: number;
+  isAdmin: boolean;
 }
 
 // User schema with savedBooks including status field
@@ -39,6 +39,11 @@ const userSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: true,
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
     savedBooks: [
       {
