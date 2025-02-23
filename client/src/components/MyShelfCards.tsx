@@ -7,14 +7,31 @@ import CardActionArea from '@mui/material/CardActionArea';
 
 interface CardProps {
   title?: string;
-  numbooks?: number;
+  numbooks?: string;
   description?: string;
   image?: string;
 }
 
-export default function ActionAreaCard({ title, numbooks, image, description }: CardProps) {
+export default function MyShelfCards({ title, numbooks, image, description }: CardProps) {
+  const handleClick = () => {
+    switch (title) {
+      case "Want to Read":
+        window.location.assign("/want-to-read");
+        break;
+      case "Currently Reading":
+        window.location.assign("/currently-reading");
+        break;
+      case "Finished Reading":
+        window.location.assign("/finished-reading");
+        break;    
+      case "Favorites":
+        window.location.assign("/favorites");
+        break;  
+    }
+  }
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345 }} onClick={handleClick}>
       <CardActionArea>
         <CardMedia
           component="img"
@@ -23,8 +40,8 @@ export default function ActionAreaCard({ title, numbooks, image, description }: 
           image={image}
           alt={title}
         />
-        <CardContent>
 
+        <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {title}
           </Typography>

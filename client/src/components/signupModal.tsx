@@ -43,7 +43,17 @@ export default function SignupModal({ open, onClose }: SignupModalProps) {
   const [loginFormData, setLoginFormData] = React.useState({ loginEmail: '', loginPassword: '' });
 
   // set initial signup form state
-  const [signupFormData, setSignupFormData] = React.useState({ signupUsername: '', signupEmail: '', signupPassword: '' });
+  const [signupFormData, setSignupFormData] = React.useState({ signupUsername: '', signupEmail: '', signupPassword: '', confirmPassword: '' });
+
+  const [passwordMatch, setPasswordMatch] = React.useState(true);
+
+  React.useEffect(() => {
+    if (signupFormData.signupPassword === signupFormData.confirmPassword) {
+      setPasswordMatch(false);
+    } else {
+      setPasswordMatch(true);
+    }
+  }, [signupFormData.confirmPassword])
 
   // show a message if login fails
   const [loginFail, setLoginFail] = React.useState(false);
@@ -78,13 +88,15 @@ export default function SignupModal({ open, onClose }: SignupModalProps) {
 
   // attempt to execute the ADD_USER mutation when "Sign Up" button is clicked
   const handleSignup = async () => {
-    try {
-      const { data } = await addUser({
-        variables: { username: signupFormData.signupUsername, email: signupFormData.signupEmail, password: signupFormData.signupPassword },
-      });
-      Auth.login(data.addUser.token);
-    } catch (err) {
-      console.error(err);
+    if (signupFormData.signupPassword === signupFormData.confirmPassword) {
+      try {
+        const { data } = await addUser({
+          variables: { username: signupFormData.signupUsername, email: signupFormData.signupEmail, password: signupFormData.signupPassword },
+        });
+        Auth.login(data.addUser.token);
+      } catch (err) {
+        console.error(err);
+      }
     }
   }
 
@@ -176,6 +188,17 @@ export default function SignupModal({ open, onClose }: SignupModalProps) {
               variant="outlined" 
               onChange={handleInputChange} 
               value={signupFormData.signupPassword || ''} 
+              required 
+            />
+            <TextField 
+              fullWidth 
+              label="Confirm Password" 
+              name="confirmPassword" 
+              type="password" 
+              variant="outlined" 
+              onChange={handleInputChange} 
+              value={signupFormData.confirmPassword || ''} 
+              error={passwordMatch}
               required 
             />
             <Button 

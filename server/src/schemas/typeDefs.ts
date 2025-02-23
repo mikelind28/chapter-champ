@@ -1,17 +1,21 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
-type User {
-  _id: ID!
-  username: String!
-  email: String!
-  # Placeholder: Virtual bookCount for total books in library
-  bookCount: Int
-  # Placeholder: User's personal library with reading status for each book
-  # Example: savedBooks: [Book]
-}
+  type User {
+    _id: ID!
+    username: String!
+    email: String!
+    # Placeholder: Virtual bookCount for total books in library
+    bookCount: Int
+    # Placeholder: User's personal library with reading status for each book
+    savedBooks: [SavedBook]
+    favoriteCount: Int
+    wantToReadCount: Int
+    currentlyReadingCount: Int
+    finishedReadingCount: Int
+  }
 
-  type Book {
+  type BookDetails {
     id: String!                     
     title: String!                  
     authors: [String]               
@@ -21,7 +25,12 @@ type User {
     categories: [String]            
     averageRating: Float            
     ratingsCount: Int               
-    infoLink: String                
+    infoLink: String   
+  }
+
+  type SavedBook {
+    status: String
+    bookDetails: BookDetails          
   }
 
   type Auth {
@@ -31,16 +40,17 @@ type User {
 
   # Input type for saving a book to user's library
   input BookInput {
-    id: String!
-    title: String!
-    authors: [String]
-    description: String
-    thumbnail: String
-    pageCount: Int
-    categories: [String]
-    averageRating: Float
-    ratingsCount: Int
-    infoLink: String
+    status: String
+    id: String!                     
+    title: String!                  
+    authors: [String]               
+    description: String             
+    thumbnail: String               
+    pageCount: Int                  
+    categories: [String]            
+    averageRating: Float            
+    ratingsCount: Int               
+    infoLink: String   
   }
 
   type Query {
@@ -51,10 +61,10 @@ type User {
     getSingleUser(id: ID, username: String): User
 
     # Search Google Books API with all specified response fields
-    searchGoogleBooks(query: String!): [Book]
+    searchGoogleBooks(query: String!): [BookDetails]
 
     # Get Google Books by ID
-    getGoogleBookById(volumeId: String!): Book
+    getGoogleBookById(volumeId: String!): BookDetails
   }
 
   type Mutation {
