@@ -1,7 +1,7 @@
 import { Box, Typography, Grid } from "@mui/material";
 // import { useNavigate } from "react-router-dom";
-import ActionAreaCard from "../components/cards";
-import auth from "../utils/auth";
+import ActionAreaCard from "../components/MyShelfCards";
+// import auth from "../utils/auth";
 
 
 const featuredBooks = [
