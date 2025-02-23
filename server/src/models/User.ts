@@ -2,6 +2,7 @@ import { Schema, model, type Document } from "mongoose";
 import bcrypt from "bcrypt";
 import bookSchema, { BookDocument } from "./Book.js";
 import type { BookStatus } from "../types/readingStatus.js";
+import { __EnumValue } from "graphql";
 
 // Interface definition for savedBooks with status
 interface SavedBook {
@@ -85,25 +86,25 @@ userSchema.methods.isCorrectPassword = async function (password: string) {
 // Virtual property for book counts based on status
 userSchema.virtual("favoriteCount").get(function () {
   return this.savedBooks.filter(
-    (book: SavedBook) => book.status === "Favorite"
+    (book: SavedBook) => book.status === "FAVORITE" || book.status === "Favorite"
   ).length;
 });
 
 userSchema.virtual("wantToReadCount").get(function () {
   return this.savedBooks.filter(
-    (book: SavedBook) => book.status === "Want to Read"
+    (book: SavedBook) => book.status === "WANT_TO_READ" || book.status === "Want to Read"
   ).length;
 });
 
 userSchema.virtual("currentlyReadingCount").get(function () {
   return this.savedBooks.filter(
-    (book: SavedBook) => book.status === "Currently Reading"
+    (book: SavedBook) => book.status === "CURRENTLY_READING" || book.status === "Currently Reading"
   ).length;
 });
 
 userSchema.virtual("finishedReadingCount").get(function () {
   return this.savedBooks.filter(
-    (book: SavedBook) => book.status === "Finished Reading"
+    (book: SavedBook) => book.status === "FINISHED_READING" || book.status === "Finished Reading"
   ).length;
 });
 

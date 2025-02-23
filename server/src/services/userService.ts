@@ -32,7 +32,7 @@ const convertUserStatusToGraphQL = (user: any) => {
  * @returns {Promise<Object>} The user object with GraphQL-compatible status.
  */
 export const getUserById = async (userId: string) => {
-  const user = await UserModel.findById(userId).select("-__v -password").lean();
+  const user = await UserModel.findById(userId).select("-__v -password");
   if (!user) throw new Error("User not found.");
   return convertUserStatusToGraphQL(user);
 };
@@ -110,7 +110,7 @@ export const saveBookToLibrary = async (
     { _id: userId, "savedBooks.bookDetails.id": { $ne: bookData.id } },
     { $addToSet: { savedBooks: { bookDetails: bookData, status: mappedStatus } } },
     { new: true, runValidators: true }
-  ).lean();
+  );
 
   if (!updatedUser) {
     throw new Error("Book already exists in the user's library or user not found.");
@@ -140,7 +140,7 @@ export const updateBookStatusInLibrary = async (
     { _id: userId, "savedBooks.bookDetails.id": bookId },
     { $set: { "savedBooks.$.status": mappedStatus } },
     { new: true }
-  ).lean();
+  );
 
   if (!updatedUser) {
     throw new Error("Book not found in user's library or user not found.");
@@ -163,7 +163,7 @@ export const removeBookFromLibrary = async (userId: string, bookId: string) => {
     userId,
     { $pull: { savedBooks: { "bookDetails.id": bookId } } },
     { new: true }
-  ).lean();
+  );
 
   if (!updatedUser) {
     throw new Error("User not found or book not in library.");

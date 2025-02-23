@@ -20,13 +20,17 @@ const typeDefs = gql`
     email: String!
     savedBooks: [SavedBook] # User's personal library with book details and reading status
     bookCount: Int # Virtual property showing the total number of saved books
+    favoriteCount: Int # Virtual property showing the total number of favorite books
+    wantToReadCount: Int # Virtual property showing the total number of want-to-read books
+    currentlyReadingCount: Int # Virtual property showing the total number of books currently reading 
+    finishedReadingCount: Int # Virtual property showing the total number of finished books
   }
 
   """
   Represents detailed information about a book.
   """
   type BookDetails {
-    id: String! # Unique identifier for the book (Google Books API ID)
+    bookId: String! # Unique identifier for the book (Google Books API ID)
     title: String! # Title of the book
     authors: [String] # List of authors
     description: String # Book description
@@ -59,7 +63,7 @@ const typeDefs = gql`
   """
   input BookInput {
     status: String
-    id: String!
+    bookId: String!
     title: String!
     authors: [String]
     description: String

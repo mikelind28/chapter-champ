@@ -1,7 +1,7 @@
 /**
  * Defines valid reading status options for books in the user's library.
  */
-export type BookStatus = "Want to Read" | "Currently Reading" | "Finished Reading" | "Favorite";
+export type BookStatus = "Want to Read" | "Currently Reading" | "Finished Reading" | "Favorite" | "WANT_TO_READ" | "CURRENTLY_READING" | "FINISHED_READING" | "FAVORITE";
 
 /**
  * Maps GraphQL enum values to Mongoose-friendly strings.
