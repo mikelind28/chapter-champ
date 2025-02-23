@@ -1,63 +1,84 @@
-import { gql } from 'apollo-server-express';
+import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
+  """
+  Enum representing the reading status of a book in the user's library.
+  """
+  enum ReadingStatus {
+    WANT_TO_READ # Book added but not started yet
+    CURRENTLY_READING # Book currently being read
+    FINISHED_READING # Book finished by the user
+    FAVORITE # Book marked as a favorite
+  }
+
+  """
+  Represents a user in the application, including their saved books and book counts.
+  """
   type User {
     _id: ID!
     username: String!
     email: String!
-    # Placeholder: Virtual bookCount for total books in library
-    bookCount: Int
-    # Placeholder: User's personal library with reading status for each book
-    savedBooks: [SavedBook]
-    favoriteCount: Int
-    wantToReadCount: Int
-    currentlyReadingCount: Int
-    finishedReadingCount: Int
+    savedBooks: [SavedBook] # User's personal library with book details and reading status
+    bookCount: Int # Virtual property showing the total number of saved books
   }
 
+  """
+  Represents detailed information about a book.
+  """
   type BookDetails {
-    id: String!                     
-    title: String!                  
-    authors: [String]               
-    description: String             
-    thumbnail: String               
-    pageCount: Int                  
-    categories: [String]            
-    averageRating: Float            
-    ratingsCount: Int               
-    infoLink: String   
+    id: String! # Unique identifier for the book (Google Books API ID)
+    title: String! # Title of the book
+    authors: [String] # List of authors
+    description: String # Book description
+    thumbnail: String # URL to the book's thumbnail image
+    pageCount: Int # Total number of pages
+    categories: [String] # Genres or categories of the book
+    averageRating: Float # Average rating from Google Books
+    ratingsCount: Int # Total number of ratings
+    infoLink: String # URL to more information about the book
   }
 
+  """
+  Represents a saved book entry in the user's library, including the reading status.
+  """
   type SavedBook {
-    status: String
-    bookDetails: BookDetails          
+    bookDetails: BookDetails! # Book details object
+    status: ReadingStatus! # Current reading status of the book
   }
 
+  """
+  Auth object returned after user registration or login.
+  """
   type Auth {
-    token: ID!
-    user: User
+    token: ID! # JWT token for authentication
+    user: User # User object associated with the token
   }
 
-  # Input type for saving a book to user's library
+  """
+  Input type for adding a book to the user's library.
+  """
   input BookInput {
     status: String
-    id: String!                     
-    title: String!                  
-    authors: [String]               
-    description: String             
-    thumbnail: String               
-    pageCount: Int                  
-    categories: [String]            
-    averageRating: Float            
-    ratingsCount: Int               
-    infoLink: String   
+    id: String!
+    title: String!
+    authors: [String]
+    description: String
+    thumbnail: String
+    pageCount: Int
+    categories: [String]
+    averageRating: Float
+    ratingsCount: Int
+    infoLink: String
   }
 
+  """
+  Queries available in the application.
+  """
   type Query {
-    # Retrieves the current logged-in user
+    # Retrieves the currently authenticated user's data
     me: User
 
-    # Retrieve user by ID or username
+    # Retrieves a user by ID or username
     getSingleUser(id: ID, username: String): User
 
     # Search Google Books API with all specified response fields
@@ -65,20 +86,32 @@ const typeDefs = gql`
 
     # Get Google Books by ID
     getGoogleBookById(volumeId: String!): BookDetails
+
+    # Admin-Only: Fetch all users
+    getAllUsers: [User]!
   }
 
+  """
+  Mutations for user authentication and book library management.
+  """
   type Mutation {
-    # Register a new user
+    # Registers a new user and returns the authentication token
     addUser(username: String!, email: String!, password: String!): Auth
 
-    # Login user and return token
+    # Logs in a user and returns a signed JWT token
     login(email: String!, password: String!): Auth
 
-    # Placeholder: Save a book to user's library (with Google Books API fields)
-    # Example: saveBook(input: BookInput!): User
+    # Saves a book to the user's library with a specified reading status
+    saveBook(input: BookInput!, status: ReadingStatus!): User
 
-    # Placeholder: Remove a book from user's library by book ID
-    # Example: removeBook(bookId: String!): User
+    # Updates the reading status of a saved book in the user's library
+    updateBookStatus(bookId: String!, status: ReadingStatus!): User
+
+    # Removes a book from the user's library by its ID
+    removeBook(bookId: String!): User
+
+    # Admin-Only: Promote User to Admin
+    promoteUser(userId: ID!): User
   }
 `;
 

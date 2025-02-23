@@ -1,11 +1,14 @@
-import { AuthenticationError } from "apollo-server-express";
-import { getGoogleBookById } from "../services/bookService.js";
 import {
-  getUserById,
-  createUser,
-  loginUser,
-} from "../services/userService.js";
-import fetch from "node-fetch";
+  getCurrentUser,
+  registerUser,
+  authenticateUser,
+  saveBook,
+  updateBookStatus,
+  removeBook,
+  getAllUsers,
+  promoteUserToAdmin,
+} from "../controllers/userController.js";
+import { searchBooks, fetchBookById } from "../controllers/bookController.js";
 
 interface SearchGoogleBooksArgs {
   query: string;
@@ -15,7 +18,6 @@ interface User {
   _id: string;
   username: string;
   email: string;
-  password: string;
   isAdmin: boolean;
 }
 
@@ -29,13 +31,18 @@ const resolvers = {
      * Retrieves the currently authenticated user's data.
      * @function me
      * @returns {Promise<User>} User data excluding sensitive fields.
-     * @throws {AuthenticationError} If the user is not authenticated.
      */
     me: async (_parent: any, _args: any, context: Context) => {
-      if (context.user) {
-        return await getUserById(context.user._id);
-      }
-      throw new AuthenticationError("Not logged in");
+      return await getCurrentUser(context);
+    },
+
+    /**
+     * Admin-only: Retrieves all users in the system.
+     * @function getAllUsers
+     * @returns {Promise<Array>} Array of user data.
+     */
+    getAllUsers: async (_parent: any, _args: any, context: Context) => {
+      return await getAllUsers(context);
     },
 
     /**
@@ -44,29 +51,7 @@ const resolvers = {
      * @returns {Promise<Array>} Array of books matching the search query.
      */
     searchGoogleBooks: async (_parent: any, { query }: SearchGoogleBooksArgs) => {
-      try {
-        const response = await fetch(
-          `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch from Google Books API");
-
-        const data = await response.json();
-        return data.items.map((item: any) => ({
-          id: item.id,
-          title: item.volumeInfo.title || "No title available",
-          authors: item.volumeInfo.authors || [],
-          description: item.volumeInfo.description || "No description available",
-          thumbnail: item.volumeInfo.imageLinks?.thumbnail || "",
-          pageCount: item.volumeInfo.pageCount || 0,
-          categories: item.volumeInfo.categories || [],
-          averageRating: item.volumeInfo.averageRating || 0,
-          ratingsCount: item.volumeInfo.ratingsCount || 0,
-          infoLink: item.volumeInfo.infoLink || "",
-        }));
-      } catch (err) {
-        console.error("Error fetching books:", err);
-        throw new Error("Failed to fetch books from Google Books API");
-      }
+      return await searchBooks(query);
     },
 
     /**
@@ -75,23 +60,18 @@ const resolvers = {
      * @returns {Promise<Object>} Detailed book information.
      */
     getGoogleBookById: async (_parent: any, { volumeId }: { volumeId: string }) => {
-      try {
-        return await getGoogleBookById(volumeId);
-      } catch (err) {
-        console.error("Error fetching book by ID:", err);
-        throw new Error("Failed to fetch book details from Google Books API");
-      }
+      return await fetchBookById(volumeId);
     },
   },
 
   Mutation: {
     /**
-     * Creates a new user and signs a JWT token.
+     * Registers a new user and returns the authentication token.
      * @function addUser
      * @returns {Promise<{ token: string; user: User }>} The user object with a signed JWT.
      */
     addUser: async (_parent: any, { username, email, password }: any) => {
-      return await createUser(username, email, password);
+      return await registerUser(username, email, password);
     },
 
     /**
@@ -101,20 +81,50 @@ const resolvers = {
      * @throws {AuthenticationError} If user credentials are invalid.
      */
     login: async (_parent: any, { email, password }: any) => {
-      return await loginUser(email, password);
+      return await authenticateUser(email, password);
     },
 
     /**
-     * Placeholder: Future implementation for saving books to user's library.
+     * Saves a book to the user's library with a specified reading status.
      * @function saveBook
+     * @param {BookInput} input - The book details input.
+     * @param {string} status - The reading status (GraphQL Enum).
+     * @returns {Promise<User>} The updated user object.
      */
-    // saveBook: async (_parent: any, _args: any, _context: Context) => {},
+    saveBook: async (_parent: any, { input, status }: any, context: Context) => {
+      return await saveBook(context, input, status);
+    },
 
     /**
-     * Placeholder: Future implementation for removing a book from user's library.
-     * @function removeBook
+     * Updates the reading status of a saved book in the user's library.
+     * @function updateBookStatus
+     * @param {string} bookId - The ID of the book to update.
+     * @param {string} status - The new reading status (GraphQL Enum).
+     * @returns {Promise<User>} The updated user object.
      */
-    // removeBook: async (_parent: any, _args: any, _context: Context) => {},
+    updateBookStatus: async (_parent: any, { bookId, status }: any, context: Context) => {
+      return await updateBookStatus(context, bookId, status);
+    },
+
+    /**
+     * Removes a book from the user's library by its ID.
+     * @function removeBook
+     * @param {string} bookId - The ID of the book to remove.
+     * @returns {Promise<User>} The updated user object after the book removal.
+     */
+    removeBook: async (_parent: any, { bookId }: any, context: Context) => {
+      return await removeBook(context, bookId);
+    },
+
+    /**
+     * Admin-only: Promotes a user to admin status.
+     * @function promoteUser
+     * @param {string} userId - The ID of the user to promote.
+     * @returns {Promise<User>} Updated user with admin privileges.
+     */
+    promoteUser: async (_parent: any, { userId }: any, context: Context) => {
+      return await promoteUserToAdmin(context, userId);
+    },
   },
 };
 

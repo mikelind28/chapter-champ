@@ -1,10 +1,12 @@
-import { Schema, model, type Document } from 'mongoose';
-import bcrypt from 'bcrypt';
-import bookSchema, { BookDocument } from './Book.js';
+import { Schema, model, type Document } from "mongoose";
+import bcrypt from "bcrypt";
+import bookSchema, { BookDocument } from "./Book.js";
+import type { BookStatus } from "../types/readingStatus.js";
 
 // Interface definition for savedBooks with status
-interface SavedBook extends BookDocument {
-  status: 'Want to Read' | 'Currently Reading' | 'Finished Reading' | 'Favorite';
+interface SavedBook {
+  bookDetails: BookDocument;
+  status: BookStatus;
 }
 
 export interface UserDocument extends Document {
@@ -12,7 +14,7 @@ export interface UserDocument extends Document {
   username: string;
   email: string;
   password: string;
-  savedBooks: SavedBook[]; 
+  savedBooks: SavedBook[];
   isCorrectPassword(password: string): Promise<boolean>;
   favoriteCount: number;
   wantToReadCount: number;
@@ -34,12 +36,9 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: true,
       unique: true,
-      match: [/.+@.+\..+/, 'Must use a valid email address'],
+      match: [/.+@.+\..+/, "Must use a valid email address"],
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true },
     isAdmin: {
       type: Boolean,
       required: true,
@@ -47,25 +46,30 @@ const userSchema = new Schema<UserDocument>(
     },
     savedBooks: [
       {
-        bookDetails: { type: bookSchema, required: true }, 
+        bookDetails: { type: bookSchema, required: true },
         status: {
           type: String,
-          enum: ['Want to Read', 'Currently Reading', 'Finished Reading', 'Favorite'],
-          default: 'Favorite',
+          enum: [
+            "Want to Read",
+            "Currently Reading",
+            "Finished Reading",
+            "Favorite",
+          ],
+          default: "Favorite",
         },
       },
     ],
   },
   {
     toJSON: {
-      virtuals: true, 
+      virtuals: true,
     },
   }
 );
 
 // Hash user password before saving
-userSchema.pre('save', async function (next) {
-  if (this.isNew || this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  if (this.isNew || this.isModified("password")) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
   }
@@ -73,26 +77,35 @@ userSchema.pre('save', async function (next) {
 });
 
 // Validate user password during login
+// Validate user password during login
 userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
 // Virtual property for book counts based on status
-userSchema.virtual('favoriteCount').get(function () {
-  return this.savedBooks.filter((book: SavedBook) => book.status === 'Favorite').length;
+userSchema.virtual("favoriteCount").get(function () {
+  return this.savedBooks.filter(
+    (book: SavedBook) => book.status === "Favorite"
+  ).length;
 });
 
-userSchema.virtual('wantToReadCount').get(function () {
-  return this.savedBooks.filter((book: SavedBook) => book.status === 'Want to Read').length;
+userSchema.virtual("wantToReadCount").get(function () {
+  return this.savedBooks.filter(
+    (book: SavedBook) => book.status === "Want to Read"
+  ).length;
 });
 
-userSchema.virtual('currentlyReadingCount').get(function () {
-  return this.savedBooks.filter((book: SavedBook) => book.status === 'Currently Reading').length;
+userSchema.virtual("currentlyReadingCount").get(function () {
+  return this.savedBooks.filter(
+    (book: SavedBook) => book.status === "Currently Reading"
+  ).length;
 });
 
-userSchema.virtual('finishedReadingCount').get(function () {
-  return this.savedBooks.filter((book: SavedBook) => book.status === 'Finished Reading').length;
+userSchema.virtual("finishedReadingCount").get(function () {
+  return this.savedBooks.filter(
+    (book: SavedBook) => book.status === "Finished Reading"
+  ).length;
 });
 
-const User = model<UserDocument>('User', userSchema);
+const User = model<UserDocument>("User", userSchema);
 export default User;

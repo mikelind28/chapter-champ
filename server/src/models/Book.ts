@@ -1,61 +1,71 @@
-//imports
 import { Schema, type Document } from "mongoose";
 
-//interface
+/**
+ * BookDocument interface representing a book's structure.
+ */
 export interface BookDocument extends Document {
-    bookId: string;
-    title: string;
-    authors?: string[];
-    description?: string;
-    thumbnail?: string;
-    pageCount?: number;
-    categories?: string[];
-    averageRating?: number;
-    ratingsCount?: number;
-    infoLink?: string;
+  id: string;
+  title: string;
+  authors?: string[];
+  description?: string;
+  thumbnail?: string;
+  pageCount?: number;
+  categories?: string[];
+  averageRating?: number;
+  ratingsCount?: number;
+  infoLink?: string;
 }
 
-//bookSchema - Part of User's array as subdocument
-const bookSchema = new Schema<BookDocument>({
-    bookId: {
-        type: String,
-        required: true
+/**
+ * bookSchema - defines the structure for the Book subdocument.
+ */
+const bookSchema = new Schema<BookDocument>(
+  {
+    id: {
+      type: String,
+      required: true,
     },
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    authors: [
-        {
-            type: String
-        }
-    ],
+    authors: {
+      type: [String],
+      default: [],
+    },
     description: {
-        type: String
+      type: String,
+      default: "No description available.",
     },
     thumbnail: {
-        type: String
+      type: String,
+      default: "",
     },
     pageCount: {
-        type: Number,
+      type: Number,
+      default: 0,
     },
-    categories: [
-        {
-            type: String
-        }
-    ],
+    categories: {
+      type: [String],
+      default: [],
+    },
     averageRating: {
-        type: Number
+      type: Number,
+      default: 0,
     },
     ratingsCount: {
-        type: Number
+      type: Number,
+      default: 0,
     },
     infoLink: {
-        type: String
-    }
-})
+      type: String,
+      default: "",
+    },
+  },
+  {
+    _id: false,
+  }
+);
 
+export { bookSchema };
 export default bookSchema;
-
-//const Book = model<BookDocument>('Book', bookSchema);
-//export default Book;
