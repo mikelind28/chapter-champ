@@ -5,9 +5,9 @@ export const BingoCell: React.FC<{ book: Book | "FREE"; onClick: () => void; mar
 
         {book === "FREE" ? "FREE SPACE" : (
         <>
-          <strong>{book.title}</strong>
+          <strong>{book.bookDetails.title}</strong>
           <br />
-          <small>{book.authors.join(", ")}</small>
+          <small>{book.bookDetails.authors.join(", ")}</small>
         </>
       )}
 

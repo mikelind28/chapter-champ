@@ -5,13 +5,17 @@ export interface User {
 }
 
 export interface Book {
-    id: string,
-    title: string,
-    authors: string[],
-    thumbnail: string,
-    pageCount: number,
-    categories: string[],
-    averageRating: number,
-    ratingsCount: number,
-    infoLink: string
+    status: string,
+    bookDetails: {
+        bookId: string,
+        title: string,
+        authors: string[],
+        description: string,
+        thumbnail: string,
+        pageCount: number,
+        categories: string[],
+        averageRating: number,
+        ratingsCount: number,
+        infoLink: string
+    }
 }
