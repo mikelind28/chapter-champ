@@ -64,13 +64,8 @@ export const createUser = async (
   password: string
 ) => {
   const user = await UserModel.create({ username, email, password });
-<<<<<<< HEAD
-  const token = signToken(user.email, user._id);
-  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
-=======
   const token = signToken(user.email, user._id, user.isAdmin);
-  return { token, user };
->>>>>>> a0a73ee978bddc70feabf758756d580866b0efe6
+  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
 };
 
 /**
@@ -83,14 +78,13 @@ export const createUser = async (
  * @throws {AuthenticationError} If authentication fails.
  */
 export const loginUser = async (email: string, password: string) => {
-<<<<<<< HEAD
   const user = await UserModel.findOne({ email });
   if (!user) throw new AuthenticationError("Can't find this user");
 
   const isValid = await user.isCorrectPassword(password);
   if (!isValid) throw new AuthenticationError("Wrong password!");
 
-  const token = signToken(user.email, user._id);
+  const token = signToken(user.email, user._id, user.isAdmin);
   return { token, user: convertUserStatusToGraphQL(user.toObject()) };
 };
 
@@ -177,19 +171,3 @@ export const removeBookFromLibrary = async (userId: string, bookId: string) => {
 
   return convertUserStatusToGraphQL(updatedUser);
 };
-=======
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      throw new AuthenticationError("Can't find this user");
-    }
-  
-    // Using the model's isCorrectPassword method
-    const isValid = await user.isCorrectPassword(password);
-    if (!isValid) {
-      throw new AuthenticationError("Wrong password!");
-    }
-  
-    const token = signToken(user.email, user._id, user.isAdmin);
-    return { token, user };
-  };
->>>>>>> a0a73ee978bddc70feabf758756d580866b0efe6
