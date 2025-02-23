@@ -9,7 +9,7 @@
         {
           "status": "Want to Read",
           "bookDetails": {
-            "id": "1",
+            "bookId": "1",
             "title": "The Great Gatsby",
             "authors": ["F. Scott Fitzgerald"],
             "description": "A novel set in the Jazz Age.",
@@ -24,7 +24,7 @@
         {
           "status": "Favorite",
           "bookDetails": {
-            "id": "2",
+            "bookId": "2",
             "title": "1984",
             "authors": ["George Orwell"],
             "description": "A dystopian novel exploring themes of totalitarianism and surveillance.",

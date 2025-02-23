@@ -19,7 +19,7 @@ export const searchBooks = async (query: string) => {
 
     const data = await response.json();
     return data.items.map((item: any) => ({
-      id: item.id,
+      bookId: item.id,
       title: item.volumeInfo.title || "No title available",
       authors: item.volumeInfo.authors || [],
       description: item.volumeInfo.description || "No description available",

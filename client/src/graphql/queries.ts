@@ -14,7 +14,7 @@ export const GET_ME = gql`
             savedBooks {
                 status
                 bookDetails {
-                    id
+                    bookId
                     title
                     authors
                     description

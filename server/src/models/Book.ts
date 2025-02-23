@@ -4,7 +4,7 @@ import { Schema, type Document } from "mongoose";
  * BookDocument interface representing a book's structure.
  */
 export interface BookDocument extends Document {
-  id: string;
+  bookId: string;
   title: string;
   authors?: string[];
   description?: string;
@@ -21,7 +21,7 @@ export interface BookDocument extends Document {
  */
 const bookSchema = new Schema<BookDocument>(
   {
-    id: {
+    bookId: {
       type: String,
       required: true,
     },
