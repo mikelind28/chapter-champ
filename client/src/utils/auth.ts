@@ -4,13 +4,16 @@ import { jwtDecode } from 'jwt-decode';
 interface UserToken {
   name: string;
   exp: number;
+  data: {
+    isAdmin: boolean;
+  }
 }
 
 // create a new class to instantiate for a user
 class AuthService {
   // get user data
   getProfile() {
-    return jwtDecode(this.getToken() || '');
+    return jwtDecode(this.getToken());
   }
 
   // check if user's logged in
@@ -18,6 +21,19 @@ class AuthService {
     // Checks if there is a saved token and it's still valid
     const token = this.getToken();
     return !!token && !this.isTokenExpired(token); // handwaiving here
+  }
+
+  //check if the logged in user is admin
+  isAdmin() {
+    try {
+      const decoded = jwtDecode<UserToken>(this.getToken());
+      if (decoded.data.isAdmin === true) {
+        return true;
+      } 
+      return false;
+    } catch (err) {
+      return false;
+    }
   }
 
   // check if token is expired
@@ -36,7 +52,7 @@ class AuthService {
 
   getToken() {
     // Retrieves the user token from localStorage
-    return localStorage.getItem('id_token');
+    return localStorage.getItem('id_token')|| '';
   }
 
   login(idToken: string) {
