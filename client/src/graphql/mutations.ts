@@ -39,6 +39,21 @@ export const SAVE_BOOK = gql`
   }
 `;
 
+export const UPDATE_BOOK_STATUS = gql`
+  mutation updateBookStatus($bookId: String!, $status: ReadingStatus!) {
+    updateBookStatus(bookId: $bookId, status: $status) {
+      _id
+      savedBooks {
+        bookDetails {
+          bookId
+          title
+        }
+        status
+      }
+    }
+  }
+`;
+
 export const REMOVE_BOOK = gql`
     mutation removeBook($bookKey: String!) {
     removeBook(bookKey: $bookKey) {

@@ -9,7 +9,8 @@ import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useMutation } from "@apollo/client";
-import { SAVE_BOOK } from "../graphql/mutations";
+
+import { SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
 
 import type { Book } from '../interfaces/Book';
@@ -19,6 +20,9 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [readingStatus, setReadingStatus] = useState<string>("Add to"); // Default text before selecting a reading status
   const [isFavorite, setIsFavorite] = useState(false);
+  const [updateBookStatus] = useMutation(UPDATE_BOOK_STATUS, {
+    refetchQueries: [{ query: GET_ME }],
+  });
 
   // Apollo mutation to save the book's reading status or favorite
   const [saveBook] = useMutation(SAVE_BOOK, {
@@ -55,18 +59,11 @@ export default function SearchBookCard({ ...CardProps }: Book) {
     setAnchorEl(null);
 
     try {
-      await saveBook({
+      await updateBookStatus({
         variables: {
-          input: {
-            bookId: CardProps.bookDetails.bookId,
-            title: CardProps.bookDetails.title,
-            authors: CardProps.bookDetails.authors,
-            description: CardProps.bookDetails.description,
-            thumbnail: CardProps.bookDetails.thumbnail,
-            infoLink: CardProps.bookDetails.infoLink,
-          },
-          status,
-        },
+          bookId: CardProps.bookDetails.bookId,
+          status: status.toLocaleLowerCase().replace(" ", "_"),            
+        },        
       });
       console.log(`📚 Updated reading status: ${status}`);
     } catch (error) {
