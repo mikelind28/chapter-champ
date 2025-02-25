@@ -1,4 +1,5 @@
 import { User as UserModel } from "../models/index.js";
+import { UserDocument } from "../models/User.js";
 import { signToken } from "../utils/auth.js";
 import { AuthenticationError } from "apollo-server-express";
 import {
@@ -9,12 +10,12 @@ import {
 
 /**
  * Converts the savedBooks status field from Mongoose format to GraphQL enum.
- * 
+ *
  * @function convertUserStatusToGraphQL
- * @param {Object} user - The user object from the database.
- * @returns {Object} The user object with GraphQL-compatible status values.
+ * @param {UserDocument} user - The user object from the database.
+ * @returns {any} The user object with GraphQL-compatible status values.
  */
-const convertUserStatusToGraphQL = (user: any) => {
+const convertUserStatusToGraphQL = (user: UserDocument): any => {
   if (user?.savedBooks) {
     user.savedBooks = user.savedBooks.map((book: any) => ({
       ...book,
@@ -29,16 +30,14 @@ const convertUserStatusToGraphQL = (user: any) => {
  *
  * @function getUserById
  * @param {string} userId - The ID of the user to retrieve.
- * @returns {Promise<Object>} The user object with GraphQL-compatible status.
+ * @returns {Promise<any>} The user object with GraphQL-compatible status.
  */
-export const getUserById = async (userId: string) => {
-  const user = await UserModel.findById(userId)
-    .select("-__v -password") // Exclude sensitive fields
-    .exec(); // Ensures we return a Mongoose document fully populated
+export const getUserById = async (userId: string): Promise<any> => {
+  const user = await UserModel.findById(userId).select("-__v -password").exec();
 
   if (!user) throw new Error("User not found.");
 
-  return convertUserStatusToGraphQL(user.toObject());
+  return convertUserStatusToGraphQL(user.toJSON());
 };
 
 /**
@@ -46,11 +45,11 @@ export const getUserById = async (userId: string) => {
  *
  * @function findUserByEmail
  * @param {string} email - The user's email address.
- * @returns {Promise<Object|null>} The user object or null if not found.
+ * @returns {Promise<any | null>} The user object or null if not found.
  */
-export const findUserByEmail = async (email: string) => {
+export const findUserByEmail = async (email: string): Promise<any | null> => {
   const user = await UserModel.findOne({ email });
-  return user ? convertUserStatusToGraphQL(user) : null;
+  return user ? convertUserStatusToGraphQL(user.toJSON()) : null;
 };
 
 /**
@@ -60,16 +59,16 @@ export const findUserByEmail = async (email: string) => {
  * @param {string} username - Desired username.
  * @param {string} email - User's email.
  * @param {string} password - User's password.
- * @returns {Promise<{ token: string; user: Object }>} JWT and user details.
+ * @returns {Promise<{ token: string; user: any }>} JWT and user details.
  */
 export const createUser = async (
   username: string,
   email: string,
   password: string
-) => {
+): Promise<{ token: string; user: any }> => {
   const user = await UserModel.create({ username, email, password });
   const token = signToken(user.email, user._id, user.isAdmin);
-  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
+  return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
 /**
@@ -78,10 +77,13 @@ export const createUser = async (
  * @function loginUser
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
- * @returns {Promise<{ token: string; user: Object }>} JWT and user details.
+ * @returns {Promise<{ token: string; user: any }>} JWT and user details.
  * @throws {AuthenticationError} If authentication fails.
  */
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<{ token: string; user: any }> => {
   const user = await UserModel.findOne({ email });
   if (!user) throw new AuthenticationError("Can't find this user");
 
@@ -89,38 +91,43 @@ export const loginUser = async (email: string, password: string) => {
   if (!isValid) throw new AuthenticationError("Wrong password!");
 
   const token = signToken(user.email, user._id, user.isAdmin);
-  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
+  return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
 /**
  * Saves a book to the user's library with the specified reading status.
- * Prevents duplicates using `$addToSet`.
  *
  * @function saveBookToLibrary
  * @param {string} userId - User's ID.
- * @param {Object} bookData - Book details.
+ * @param {any} bookData - Book details.
  * @param {BookStatus} status - Reading status (GraphQL enum).
- * @returns {Promise<Object>} Updated user with GraphQL-compatible status.
+ * @returns {Promise<any>} Updated user with GraphQL-compatible status.
  * @throws {Error} If the user is not found or duplicate book exists.
  */
 export const saveBookToLibrary = async (
   userId: string,
   bookData: any,
   status: BookStatus
-) => {
+): Promise<any> => {
   const mappedStatus = mapGraphQLStatusToMongoose(status);
 
   const updatedUser = await UserModel.findOneAndUpdate(
     { _id: userId, "savedBooks.bookDetails.bookId": { $ne: bookData.bookId } },
-    { $addToSet: { savedBooks: { bookDetails: bookData, status: mappedStatus } } },
+    {
+      $addToSet: {
+        savedBooks: { bookDetails: bookData, status: mappedStatus },
+      },
+    },
     { new: true, runValidators: true }
   );
 
   if (!updatedUser) {
-    throw new Error("Book already exists in the user's library or user not found.");
+    throw new Error(
+      "Book already exists in the user's library or user not found."
+    );
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON());
 };
 
 /**
@@ -130,14 +137,14 @@ export const saveBookToLibrary = async (
  * @param {string} userId - User's ID.
  * @param {string} bookId - Book's ID.
  * @param {BookStatus} newStatus - New reading status (GraphQL enum).
- * @returns {Promise<Object>} Updated user with GraphQL-compatible status.
+ * @returns {Promise<any>} Updated user with GraphQL-compatible status.
  * @throws {Error} If user or book not found.
  */
 export const updateBookStatusInLibrary = async (
   userId: string,
   bookId: string,
   newStatus: BookStatus
-) => {
+): Promise<any> => {
   const mappedStatus = mapGraphQLStatusToMongoose(newStatus);
 
   const updatedUser = await UserModel.findOneAndUpdate(
@@ -150,7 +157,7 @@ export const updateBookStatusInLibrary = async (
     throw new Error("Book not found in user's library or user not found.");
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON());
 };
 
 /**
@@ -159,10 +166,13 @@ export const updateBookStatusInLibrary = async (
  * @function removeBookFromLibrary
  * @param {string} userId - User's ID.
  * @param {string} bookId - Book's ID to remove.
- * @returns {Promise<Object>} Updated user without the removed book.
+ * @returns {Promise<any>} Updated user without the removed book.
  * @throws {Error} If user not found.
  */
-export const removeBookFromLibrary = async (userId: string, bookId: string) => {
+export const removeBookFromLibrary = async (
+  userId: string,
+  bookId: string
+): Promise<any> => {
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
     { $pull: { savedBooks: { "bookDetails.bookId": bookId } } },
@@ -173,5 +183,5 @@ export const removeBookFromLibrary = async (userId: string, bookId: string) => {
     throw new Error("User not found or book not in library.");
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON());
 };

@@ -1,7 +1,7 @@
 import { Schema, type Document } from "mongoose";
 
 /**
- * BookDocument interface representing a book's structure.
+ * BookDocument interface representing the structure of a book.
  */
 export interface BookDocument extends Document {
   bookId: string;
@@ -17,17 +17,17 @@ export interface BookDocument extends Document {
 }
 
 /**
- * bookSchema - defines the structure for the Book subdocument.
+ * bookSchema - Defines the Mongoose schema for a Book subdocument.
  */
 const bookSchema = new Schema<BookDocument>(
   {
     bookId: {
       type: String,
-      required: true,
+      required: [true, "Book ID is required."],
     },
     title: {
       type: String,
-      required: true,
+      required: [true, "Book title is required."],
     },
     authors: {
       type: [String],
@@ -40,10 +40,15 @@ const bookSchema = new Schema<BookDocument>(
     thumbnail: {
       type: String,
       default: "",
+      validate: {
+        validator: (v: string) => !v || /^https?:\/\/.+/.test(v),
+        message: "Thumbnail must be a valid URL.",
+      },
     },
     pageCount: {
       type: Number,
       default: 0,
+      min: [0, "Page count cannot be negative."],
     },
     categories: {
       type: [String],
@@ -52,14 +57,21 @@ const bookSchema = new Schema<BookDocument>(
     averageRating: {
       type: Number,
       default: 0,
+      min: [0, "Average rating cannot be negative."],
+      max: [5, "Average rating cannot exceed 5."],
     },
     ratingsCount: {
       type: Number,
       default: 0,
+      min: [0, "Ratings count cannot be negative."],
     },
     infoLink: {
       type: String,
       default: "",
+      validate: {
+        validator: (v: string) => !v || /^https?:\/\/.+/.test(v),
+        message: "Info link must be a valid URL.",
+      },
     },
   },
   {
@@ -67,5 +79,6 @@ const bookSchema = new Schema<BookDocument>(
   }
 );
 
+// Export the schema
 export { bookSchema };
 export default bookSchema;

@@ -1,5 +1,7 @@
-import { getGoogleBookById } from "../services/bookService.js";
-import fetch from "node-fetch";
+import {
+  getGoogleBookById,
+  searchGoogleBooks,
+} from "../services/bookService.js";
 
 /**
  * Searches books using the Google Books API.
@@ -8,31 +10,19 @@ import fetch from "node-fetch";
  * @throws {Error} If the fetch from Google Books API fails.
  */
 export const searchBooks = async (query: string) => {
-  try {
-    const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
-        query
-      )}`
-    );
-    if (!response.ok)
-      throw new Error("Failed to fetch data from Google Books API");
+  if (!query) {
+    console.warn("searchBooks called without a query.");
+    throw new Error("Query parameter is required.");
+  }
 
-    const data = await response.json();
-    return data.items.map((item: any) => ({
-      bookId: item.id,
-      title: item.volumeInfo.title || "No title available",
-      authors: item.volumeInfo.authors || [],
-      description: item.volumeInfo.description || "No description available",
-      thumbnail: item.volumeInfo.imageLinks?.thumbnail || "",
-      pageCount: item.volumeInfo.pageCount || 0,
-      categories: item.volumeInfo.categories || [],
-      averageRating: item.volumeInfo.averageRating || 0,
-      ratingsCount: item.volumeInfo.ratingsCount || 0,
-      infoLink: item.volumeInfo.infoLink || "",
-    }));
+  try {
+    console.log(`Searching books for query: "${query}"`);
+    const books = await searchGoogleBooks(query);
+    console.log(`Found ${books.length} books for query: "${query}"`);
+    return books;
   } catch (error) {
-    console.error("Error fetching books:", error);
-    throw new Error("Failed to fetch books from Google Books API");
+    console.error(`Error fetching books for query "${query}":`, error);
+    throw new Error(`Failed to fetch books for query: "${query}"`);
   }
 };
 
@@ -43,10 +33,18 @@ export const searchBooks = async (query: string) => {
  * @throws {Error} If the fetch from Google Books API fails.
  */
 export const fetchBookById = async (volumeId: string) => {
+  if (!volumeId) {
+    console.warn("fetchBookById called without a volumeId.");
+    throw new Error("Volume ID is required.");
+  }
+
   try {
-    return await getGoogleBookById(volumeId);
+    console.log(`Fetching details for book with ID: ${volumeId}`);
+    const bookDetails = await getGoogleBookById(volumeId);
+    console.log(`Successfully retrieved details for book ID: ${volumeId}`);
+    return bookDetails;
   } catch (error) {
-    console.error(`Error fetching book with ID ${volumeId}:`, error);
-    throw new Error("Failed to fetch book details from Google Books API");
+    console.error(`Error fetching book with ID "${volumeId}":`, error);
+    throw new Error(`Failed to fetch book details for ID: "${volumeId}"`);
   }
 };

@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export interface ApolloContext {
-  user: { _id: string; username: string } | null;
+  user: { _id: string } | null; // Removed username as requested
 }
 
 const server = new ApolloServer({ typeDefs, resolvers });
@@ -32,24 +32,27 @@ const startApolloServer = async () => {
 
   // Improved CORS handling
   app.use(
-    cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000" })
+    cors({
+      origin: process.env.FRONTEND_URL || "http://localhost:3000",
+      credentials: true,
+    })
   );
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
   app.use("/api", apiRoutes);
 
-  // Enhanced authentication context with error handling
+  // Authentication context with refined logging
   app.use(
     "/graphql",
     expressMiddleware(server, {
       context: async ({ req }: { req: Request }): Promise<ApolloContext> => {
         try {
           const context = authenticateToken({ req });
-          console.log(
-            process.env.NODE_ENV === "development"
-              ? `Authenticated user: ${JSON.stringify(context.user)}`
-              : ""
-          );
+          if (process.env.NODE_ENV === "development") {
+            console.log(
+              `Authenticated user ID: ${context.user?._id || "None"}`
+            );
+          }
           return { user: context.user || null };
         } catch (error) {
           console.error("Error authenticating token:", error);
@@ -59,10 +62,10 @@ const startApolloServer = async () => {
     })
   );
 
-  // Serve frontend in production with logging
+  // Serve frontend in production
   if (process.env.NODE_ENV === "production") {
     const clientPath = path.join(__dirname, "../../client/dist");
-    console.log(`Resolved clientPath: ${clientPath}`);
+    console.log(`Serving static files from: ${clientPath}`);
     app.use(express.static(clientPath));
     app.get("*", (_req: Request, res: Response) =>
       res.sendFile(path.join(clientPath, "index.html"))
@@ -77,9 +80,10 @@ const startApolloServer = async () => {
   // Global error handler
   app.use(errorHandler);
 
+  // Server listening
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
-    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+    console.log(`GraphQL available at http://localhost:${PORT}/graphql`);
   });
 
   // Graceful shutdown

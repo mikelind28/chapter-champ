@@ -62,7 +62,6 @@ const typeDefs = gql`
   Input type for adding a book to the user's library.
   """
   input BookInput {
-    status: String
     bookId: String!
     title: String!
     authors: [String]
@@ -73,6 +72,7 @@ const typeDefs = gql`
     averageRating: Float
     ratingsCount: Int
     infoLink: String
+    status: ReadingStatus!
   }
 
   """
@@ -90,32 +90,26 @@ const typeDefs = gql`
 
     # Get Google Books by ID
     getGoogleBookById(volumeId: String!): BookDetails
-
-    # Admin-Only: Fetch all users
-    getAllUsers: [User]!
   }
 
   """
   Mutations for user authentication and book library management.
   """
-  type Mutation {
-    # Registers a new user and returns the authentication token
-    addUser(username: String!, email: String!, password: String!): Auth
+type Mutation {
+  # Registers a new user and returns the authentication token
+  addUser(username: String!, email: String!, password: String!): Auth
 
-    # Logs in a user and returns a signed JWT token
-    login(email: String!, password: String!): Auth
+  # Logs in a user and returns a signed JWT token
+  login(email: String!, password: String!): Auth
 
-    # Saves a book to the user's library with a specified reading status
-    saveBook(input: BookInput!, status: ReadingStatus!): User
+  # Saves a book to the user's library with a specified reading status (status inside BookInput)
+  saveBook(input: BookInput!): User
 
-    # Updates the reading status of a saved book in the user's library
-    updateBookStatus(bookId: String!, status: ReadingStatus!): User
+  # Updates the reading status of a saved book in the user's library
+  updateBookStatus(bookId: String!, status: ReadingStatus!): User
 
-    # Removes a book from the user's library by its ID
-    removeBook(bookId: String!): User
-
-    # Admin-Only: Promote User to Admin
-    promoteUser(userId: ID!): User
+  # Removes a book from the user's library by its ID
+  removeBook(bookId: String!): User
   }
 `;
 
