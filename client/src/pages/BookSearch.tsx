@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Grid, Box, Typography, Drawer, List, ListItem, ListItemText } from "@mui/material";
 import { useQuery } from "@apollo/client";
 import { SEARCH_GOOGLE_BOOKS } from "../graphql/queries";
-import BookCard from "../components/BookCard";
+import SearchBookCard from "../components/searchBookCard";
 
 const BookSearch: React.FC = () => {
   const location = useLocation();
@@ -21,7 +21,7 @@ const BookSearch: React.FC = () => {
   return (
     <Box sx={{ display: "flex" }}>
       {/* Sidebar */}
-      <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0 }}>
+      {/* <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0 }}>
         <Box sx={{ width: 240, padding: 2 }}>
           <Typography variant="h6">Advanced Search</Typography>
           <List>
@@ -36,7 +36,7 @@ const BookSearch: React.FC = () => {
             </ListItem>
           </List>
         </Box>
-      </Drawer>
+      </Drawer> */}
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, padding: 3, marginLeft: "240px" }}>
@@ -48,7 +48,7 @@ const BookSearch: React.FC = () => {
         <Grid container spacing={3} sx={{ marginTop: 2 }}>
         {data?.searchGoogleBooks?.map((book: any) => (
             <Grid item key={book.bookId} xs={12} sm={6} md={4} lg={3}>
-              <BookCard bookDetails={book} status={book.status} />
+              <SearchBookCard bookDetails={book} status={book.status} />
             </Grid>
           ))}
         </Grid>
