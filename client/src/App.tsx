@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 // import { useState } from "react";
+import logo from "./assets/images/logo.png"
 import Navbar from "./components/Navbar";
 import {
   ApolloClient,
@@ -50,7 +51,7 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Navbar
-        
+        logo={logo}
         logoSize={100}
         links={[{ label: "Home", path: "/" }]}
         // user={user}

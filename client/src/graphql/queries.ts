@@ -31,10 +31,9 @@ export const GET_ME = gql`
 `;
 
 export const SEARCH_GOOGLE_BOOKS = gql`
-    query searchGoogleBooks($query: string) {
+    query searchGoogleBooks($query: String!) {
         searchGoogleBooks(query: $query) {
-            _id
-            id
+            bookId
             title
             authors
             description
