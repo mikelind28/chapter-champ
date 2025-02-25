@@ -64,7 +64,16 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
             <Button type="submit" variant="contained" color="secondary">
               Search
             </Button>
+            <Button
+              color="secondary"
+              sx={{ marginTop: 1, textTransform: "none" }}
+              onClick={() => navigate("/book-search")}
+            >
+              Advanced Search
+            </Button>
           </form>
+          {/* Botón de Advanced Search */}
+
         </Box>       
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

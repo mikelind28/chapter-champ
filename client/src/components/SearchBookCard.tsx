@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -9,7 +9,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useMutation, useApolloClient } from "@apollo/client";
+import { useMutation, useApolloClient, useQuery } from "@apollo/client";
 
 import { SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
@@ -25,6 +25,22 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const [updateBookStatus] = useMutation(UPDATE_BOOK_STATUS, {
     refetchQueries: [{ query: GET_ME }],
   });
+  // Apollo query to get the user's saved books
+  const { data } = useQuery(GET_ME);
+  const savedBooks = data?.me?.savedBooks || [];
+  const isAuthenticated = !!data?.me;  // Check if the user is logged in
+  
+  const savedBook = savedBooks.find(
+    (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
+  );
+
+  // Set the reading status and favorite status when the component
+  useEffect(() => {
+    if (savedBook) {
+      setReadingStatus(savedBook.status);
+      setIsFavorite(savedBook.status === "FAVORITE");
+    }
+  }, [savedBook]);
 
   // Apollo mutation to save the book's reading status or favorite
   const [saveBook] = useMutation(SAVE_BOOK, {
@@ -51,9 +67,9 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   };
 
   // Open the reading status menu
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
   // Select a reading status and save it to the database
   const handleMenuClose = async (status: string) => {
@@ -162,32 +178,28 @@ export default function SearchBookCard({ ...CardProps }: Book) {
               {CardProps.bookDetails.description || "No description available."}
             </Typography>
           )}
-
-          {/* Favorite Button & Reading Status Menu */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
-            {/* Favorite Button */}
-            <IconButton onClick={toggleFavorite} color={isFavorite ? "error" : "default"}>
-              <FavoriteIcon />
-            </IconButton>
-
-            {/* Reading Status Selector */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="body2" sx={{ marginRight: 1, fontStyle: "italic" }}>
-                {readingStatus}
-              </Typography>
-              <IconButton onClick={handleMenuClick}>
-                <MoreVertIcon />
+          {isAuthenticated && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+              <IconButton onClick={toggleFavorite} color={isFavorite ? "error" : "default"}>
+                <FavoriteIcon />
               </IconButton>
-            </div>
 
-            {/* Reading Status Menu */}
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-              <MenuItem onClick={() => handleMenuClose("Add to")}>Add to</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
-            </Menu>
-          </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Typography variant="body2" sx={{ marginRight: 1, fontStyle: "italic" }}>
+                  {readingStatus}
+                </Typography>
+                <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
+                  <MoreVertIcon />
+                </IconButton>
+              </div>
+
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
+                <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
+                <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
+              </Menu>
+            </div>
+          )}
         </CardContent>
       </CardActionArea>
     </Card>

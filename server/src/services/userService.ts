@@ -38,7 +38,7 @@ export const getUserById = async (userId: string) => {
 
   if (!user) throw new Error("User not found.");
 
-  return convertUserStatusToGraphQL(user.toObject());
+  return convertUserStatusToGraphQL(user.toJSON());
 };
 
 /**
