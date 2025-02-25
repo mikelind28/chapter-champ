@@ -10,6 +10,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useMutation } from "@apollo/client";
 import { SAVE_BOOK } from "../graphql/mutations";
+import { GET_ME } from "../graphql/queries";
 
 import type { Book } from '../interfaces/Book';
 
@@ -20,7 +21,23 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Apollo mutation to save the book's reading status or favorite
-  const [saveBook] = useMutation(SAVE_BOOK);
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    update(cache, { data: { saveBook } }) {
+      const existingData = cache.readQuery<any>({ query: GET_ME });
+
+      if (existingData) {
+        cache.writeQuery({
+          query: GET_ME,
+          data: {
+            me: {
+              ...existingData.me,
+              savedBooks: [...existingData.me.savedBooks, saveBook],
+            },
+          },
+        });
+      }
+    },
+  });
 
   // Toggle the description visibility when clicking "Description"
   const toggleDescription = () => {
@@ -137,6 +154,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
 
             {/* Reading Status Menu */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+              <MenuItem onClick={() => handleMenuClose("Add to")}>Add to</MenuItem>
               <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
               <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
               <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
