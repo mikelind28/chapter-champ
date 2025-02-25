@@ -85,6 +85,9 @@ const typeDefs = gql`
     # Retrieves a user by ID or username
     getSingleUser(id: ID, username: String): User
 
+    # Retrieves all users
+    getUsers: [User]!
+
     # Search Google Books API with all specified response fields
     searchGoogleBooks(query: String!): [BookDetails]
 

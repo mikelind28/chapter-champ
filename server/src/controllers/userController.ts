@@ -3,11 +3,14 @@ import {
     getUserById,
     createUser,
     loginUser,
+    //findUsers,
     saveBookToLibrary,
     updateBookStatusInLibrary,
     removeBookFromLibrary,
   } from "../services/userService.js";
   import { AuthenticationError, ForbiddenError } from "apollo-server-express";
+import User from "../models/User.js";
+
   
   /**
    * Ensures the current user is authenticated.
@@ -37,7 +40,22 @@ import {
     ensureAuthenticated(context);
     return await getUserById(context.user._id);
   };
+
+  /**
+   * Retrieves all the Users
+  */
+  export const getUsers = async (context: any) => {
+     try{
+      ensureAdmin(context);
+      //return await findUsers(context.user._id)
+      return await User.find();
+    }
+    catch(err) {
+      return err;
+    }
+  }
   
+
   /**
    * Registers a new user and returns authentication data.
    * @param {string} username - New user's username.

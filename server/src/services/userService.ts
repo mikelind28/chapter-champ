@@ -53,6 +53,22 @@ export const findUserByEmail = async (email: string) => {
   return user ? convertUserStatusToGraphQL(user) : null;
 };
 
+/*
+* Finds all users
+* @function findUsers
+* @returns Array of Users
+*/
+// export const findUsers = async() => {
+//   try{
+//     const user = await UserModel.find();
+//     return user;
+//   }
+//   catch(err) {
+//     return err; 
+//   }
+// };
+
+
 /**
  * Creates a new user and returns an authentication token with user details.
  *
