@@ -17,6 +17,7 @@ import WantToRead from './pages/WantToRead.tsx';
 import CurrentlyReading from './pages/CurrentlyReading.tsx';
 import FinishedReading from './pages/FinishedReading.tsx';
 import Favorites from './pages/Favorites.tsx';
+import BookSearch from './pages/BookSearch.tsx';
 
 // Material UI Theme
 const theme = createTheme({
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> }, // Loads HomePage on "/"
       { path: "shelf", element: <ShelfPage /> },
       { path: "account", element: <AccountPage /> },
+      { path: "book-search", element: <BookSearch /> },
       { path: "challenges", element: <Challenges /> },
       { path: "manageusers", element: <ManageUsers /> },
       { path: "want-to-read", element: <WantToRead />},

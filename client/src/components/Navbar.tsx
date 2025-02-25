@@ -20,12 +20,20 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const [dashboardMenuEl, setDashboardMenuEl] = useState<null | HTMLElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
   // const [loggedIn, setLoggedIn] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
  
   const navigate = useNavigate();
 
   const handleNavigate = (path: string) => {
     navigate(path);
     setDashboardMenuEl(null); // Close menu after navigating
+  };
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/book-search?query=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   const handleLogout = () => {
@@ -45,7 +53,18 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
           {logo && <img src={logo} alt="Logo" style={{ height: logoSize, width: "auto", marginRight: 10 }} />}
-          <TextField color="secondary" label="Book Search" id="searchBar" sx={{ width: "300px"}} />
+          <form onSubmit={handleSearch}>
+            <TextField
+              color="secondary"
+              label="Book Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ width: "300px", marginRight: "10px" }}
+            />
+            <Button type="submit" variant="contained" color="secondary">
+              Search
+            </Button>
+          </form>
         </Box>       
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
