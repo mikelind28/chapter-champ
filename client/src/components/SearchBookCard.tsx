@@ -12,6 +12,7 @@ import { useMutation } from "@apollo/client";
 import { SAVE_BOOK } from "../graphql/mutations";
 
 import type { Book } from '../interfaces/Book';
+import { GET_ME } from "../graphql/queries";
 
 export default function SearchBookCard({ ...CardProps }: Book) {
   const [showDescription, setShowDescription] = useState(false);
@@ -20,7 +21,12 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Apollo mutation to save the book's reading status or favorite
-  const [saveBook] = useMutation(SAVE_BOOK);
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    refetchQueries: [
+        GET_ME,
+        'me'
+    ]
+    });
 
   // Toggle the description visibility when clicking "Description"
   const toggleDescription = () => {
@@ -46,9 +52,11 @@ export default function SearchBookCard({ ...CardProps }: Book) {
             authors: CardProps.bookDetails.authors,
             description: CardProps.bookDetails.description,
             thumbnail: CardProps.bookDetails.thumbnail,
+            pageCount: CardProps.bookDetails.pageCount,
+            categories: CardProps.bookDetails.categories,
             infoLink: CardProps.bookDetails.infoLink,
           },
-          status,
+          status: status,
         },
       });
       console.log(`📚 Updated reading status: ${status}`);
@@ -70,6 +78,8 @@ export default function SearchBookCard({ ...CardProps }: Book) {
             authors: CardProps.bookDetails.authors,
             description: CardProps.bookDetails.description,
             thumbnail: CardProps.bookDetails.thumbnail,
+            pageCount: CardProps.bookDetails.pageCount,
+            categories: CardProps.bookDetails.categories,
             infoLink: CardProps.bookDetails.infoLink,
           },
           status: "FAVORITE",
@@ -137,9 +147,9 @@ export default function SearchBookCard({ ...CardProps }: Book) {
 
             {/* Reading Status Menu */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-              <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
+              <MenuItem onClick={() => handleMenuClose("WANT_TO_READ")}>📖 Want to Read</MenuItem>
+              <MenuItem onClick={() => handleMenuClose("CURRENTLY_READING")}>📚 Currently Reading</MenuItem>
+              <MenuItem onClick={() => handleMenuClose("FINISHED_READING")}>✅ Finished Reading</MenuItem>
             </Menu>
           </div>
         </CardContent>

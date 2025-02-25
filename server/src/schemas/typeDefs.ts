@@ -62,7 +62,7 @@ const typeDefs = gql`
   Input type for adding a book to the user's library.
   """
   input BookInput {
-    status: String
+    # status: String
     bookId: String!
     title: String!
     authors: [String]

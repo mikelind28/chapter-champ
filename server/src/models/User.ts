@@ -65,7 +65,7 @@ const userSchema = new Schema<UserDocument>(
     toJSON: {
       virtuals: true,
     },
-  }
+  },
 );
 
 // Hash user password before saving
