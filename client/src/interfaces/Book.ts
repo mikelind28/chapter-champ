@@ -2,7 +2,7 @@ export interface User {
     id: string,
     username: string,
     email: string,
-    savedBooks: SavedBook[]; // Array of saved books
+    savedBooks: SavedBook[];            // Array of saved books
 }
 
 export interface Book {
@@ -21,7 +21,7 @@ export interface Book {
     }
 }
 
-export interface SavedBook {
+export interface SavedBook {            // SavedBook interface
     bookDetails: {
         bookId: string;
         title: string;

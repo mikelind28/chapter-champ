@@ -29,7 +29,7 @@ export const SAVE_BOOK = gql`
     saveBook(input: $input, status: $status) {
       _id
       savedBooks {
-        bookdetails {
+        bookDetails {
           bookId
           title
         }
