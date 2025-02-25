@@ -19,7 +19,7 @@ export const searchGoogleBooks = async (query: string, maxResults: number = 10) 
     });
 
     return response.data.items?.map((book: any) => ({
-      id: book.id,
+      bookId: book.id,
       title: book.volumeInfo.title,
       authors: book.volumeInfo.authors || [],
       description: book.volumeInfo.description || 'No description available.',
@@ -49,7 +49,7 @@ export const getGoogleBookById = async (volumeId: string) => {
 
     const book = response.data;
     return {
-      id: book.id,
+      bookId: book.id,
       title: book.volumeInfo.title,
       authors: book.volumeInfo.authors || [],
       description: book.volumeInfo.description || 'No description available.',
