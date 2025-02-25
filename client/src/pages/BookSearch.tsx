@@ -1,9 +1,9 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Grid, Box, Typography, Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { Grid, Box, Typography} from "@mui/material";
 import { useQuery } from "@apollo/client";
 import { SEARCH_GOOGLE_BOOKS } from "../graphql/queries";
-import SearchBookCard from "../components/searchBookCard";
+import SearchBookCard from "../components/SearchBookCard";
 
 const BookSearch: React.FC = () => {
   const location = useLocation();
@@ -19,24 +19,7 @@ const BookSearch: React.FC = () => {
   });
 
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* Sidebar */}
-      {/* <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0 }}>
-        <Box sx={{ width: 240, padding: 2 }}>
-          <Typography variant="h6">Advanced Search</Typography>
-          <List>
-            <ListItem button>
-              <ListItemText primary="By Genre" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="By Author" />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary="By Year" />
-            </ListItem>
-          </List>
-        </Box>
-      </Drawer> */}
+    <Box sx={{ display: "flex" }}>    
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, padding: 3, marginLeft: "240px" }}>
