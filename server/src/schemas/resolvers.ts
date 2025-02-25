@@ -50,7 +50,10 @@ const resolvers = {
      * @function searchGoogleBooks
      * @returns {Promise<Array>} Array of books matching the search query.
      */
-    searchGoogleBooks: async (_parent: any, { query }: SearchGoogleBooksArgs) => {
+    searchGoogleBooks: async (
+      _parent: any,
+      { query }: SearchGoogleBooksArgs
+    ) => {
       return await searchBooks(query);
     },
 
@@ -59,7 +62,10 @@ const resolvers = {
      * @function getGoogleBookById
      * @returns {Promise<Object>} Detailed book information.
      */
-    getGoogleBookById: async (_parent: any, { volumeId }: { volumeId: string }) => {
+    getGoogleBookById: async (
+      _parent: any,
+      { volumeId }: { volumeId: string }
+    ) => {
       return await fetchBookById(volumeId);
     },
   },
@@ -91,8 +97,9 @@ const resolvers = {
      * @param {string} status - The reading status (GraphQL Enum).
      * @returns {Promise<User>} The updated user object.
      */
-    saveBook: async (_parent: any, { input, status }: any, context: Context) => {
-      return await saveBook(context, input, status);
+    saveBook: async (_parent: any, { input }: any, context: Context) => {
+      const { status, ...bookDetails } = input;
+      return await saveBook(context, bookDetails, status);
     },
 
     /**
@@ -102,7 +109,11 @@ const resolvers = {
      * @param {string} status - The new reading status (GraphQL Enum).
      * @returns {Promise<User>} The updated user object.
      */
-    updateBookStatus: async (_parent: any, { bookId, status }: any, context: Context) => {
+    updateBookStatus: async (
+      _parent: any,
+      { bookId, status }: any,
+      context: Context
+    ) => {
       return await updateBookStatus(context, bookId, status);
     },
 

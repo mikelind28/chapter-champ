@@ -62,17 +62,17 @@ const typeDefs = gql`
   Input type for adding a book to the user's library.
   """
   input BookInput {
-    status: String
-    bookId: String!
-    title: String!
-    authors: [String]
-    description: String
-    thumbnail: String
-    pageCount: Int
-    categories: [String]
-    averageRating: Float
-    ratingsCount: Int
-    infoLink: String
+  bookId: String!
+  title: String!
+  authors: [String]
+  description: String
+  thumbnail: String
+  pageCount: Int
+  categories: [String]
+  averageRating: Float
+  ratingsCount: Int
+  infoLink: String
+  status: ReadingStatus!
   }
 
   """
@@ -106,7 +106,7 @@ const typeDefs = gql`
     login(email: String!, password: String!): Auth
 
     # Saves a book to the user's library with a specified reading status
-    saveBook(input: BookInput!, status: ReadingStatus!): User
+    saveBook(input: BookInput!): User
 
     # Updates the reading status of a saved book in the user's library
     updateBookStatus(bookId: String!, status: ReadingStatus!): User
