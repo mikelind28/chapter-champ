@@ -5,10 +5,10 @@ const typeDefs = gql`
   Enum representing the reading status of a book in the user's library.
   """
   enum ReadingStatus {
-    WANT_TO_READ # Book added but not started yet
-    CURRENTLY_READING # Book currently being read
-    FINISHED_READING # Book finished by the user
-    FAVORITE # Book marked as a favorite
+    WANT_TO_READ                                  # Book added but not started yet
+    CURRENTLY_READING                             # Book currently being read
+    FINISHED_READING                              # Book finished by the user
+    FAVORITE                                      # Book marked as a favorite
   }
 
   """
@@ -18,44 +18,44 @@ const typeDefs = gql`
     _id: ID!
     username: String!
     email: String!
-    savedBooks: [SavedBook] # User's personal library with book details and reading status
-    bookCount: Int # Virtual property showing the total number of saved books
-    favoriteCount: Int # Virtual property showing the total number of favorite books
-    wantToReadCount: Int # Virtual property showing the total number of want-to-read books
-    currentlyReadingCount: Int # Virtual property showing the total number of books currently reading 
-    finishedReadingCount: Int # Virtual property showing the total number of finished books
+    savedBooks: [SavedBook]                       # User's personal library with book details and reading status
+    bookCount: Int                                # Virtual property showing the total number of saved books
+    favoriteCount: Int                            # Virtual property showing the total number of favorite books
+    wantToReadCount: Int                          # Virtual property showing the total number of want-to-read books
+    currentlyReadingCount: Int                    # Virtual property showing the total number of books currently reading 
+    finishedReadingCount: Int                     # Virtual property showing the total number of finished books
   }
 
   """
   Represents detailed information about a book.
   """
   type BookDetails {
-    bookId: String! # Unique identifier for the book (Google Books API ID)
-    title: String! # Title of the book
-    authors: [String] # List of authors
-    description: String # Book description
-    thumbnail: String # URL to the book's thumbnail image
-    pageCount: Int # Total number of pages
-    categories: [String] # Genres or categories of the book
-    averageRating: Float # Average rating from Google Books
-    ratingsCount: Int # Total number of ratings
-    infoLink: String # URL to more information about the book
+    bookId: String!                               # Unique identifier for the book (Google Books API ID)
+    title: String!                                # Title of the book
+    authors: [String]                             # List of authors
+    description: String                           # Book description
+    thumbnail: String                             # URL to the book's thumbnail image
+    pageCount: Int                                # Total number of pages
+    categories: [String]                          # Genres or categories of the book
+    averageRating: Float                          # Average rating from Google Books
+    ratingsCount: Int                             # Total number of ratings
+    infoLink: String                              # URL to more information about the book
   }
 
   """
   Represents a saved book entry in the user's library, including the reading status.
   """
   type SavedBook {
-    bookDetails: BookDetails! # Book details object
-    status: ReadingStatus! # Current reading status of the book
+    bookDetails: BookDetails!                     # Book details object
+    status: ReadingStatus!                        # Current reading status of the book
   }
 
   """
   Auth object returned after user registration or login.
   """
   type Auth {
-    token: ID! # JWT token for authentication
-    user: User # User object associated with the token
+    token: ID!                                    # JWT token for authentication
+    user: User                                    # User object associated with the token
   }
 
   """
