@@ -9,9 +9,10 @@ import CardActionArea from '@mui/material/CardActionArea';
 import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteIcon from "@mui/icons-material/Delete"
 import { useMutation, useApolloClient, useQuery } from "@apollo/client";
 
-import { SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
+import { REMOVE_BOOK, SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
 
 import type { Book, SavedBook } from '../interfaces/Book';
@@ -61,21 +62,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
     }
   }, [CardProps, data])
 
-    // const savedBooks = data?.me?.savedBooks || [];
-    const isAuthenticated = !!data?.me;  // Check if the user is logged in
-
-  
-  // const savedBook = savedBooks.find(
-  //   (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
-  // );
-
-  // Set the reading status and favorite status when the component
-  // useEffect(() => {
-  //   if (savedBook) {
-  //     setReadingStatus(savedBook.status);
-  //     setIsFavorite(savedBook.status === "FAVORITE");
-  //   }
-  // }, [savedBook]);
+  const isAuthenticated = !!data?.me;  // Check if the user is logged in
 
   // Apollo mutation to save the book's reading status or favorite
   const [saveBook] = useMutation(SAVE_BOOK, {
@@ -100,11 +87,6 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const toggleDescription = () => {
     setShowDescription(!showDescription);
   };
-
-  // Open the reading status menu
-  // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
 
   // Select a reading status and save it to the database
   const handleMenuClose = async (status: string) => {
@@ -184,6 +166,21 @@ export default function SearchBookCard({ ...CardProps }: Book) {
     }
   };
 
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [{ query: GET_ME }],
+  });
+
+  const handleRemoveBook = async () => {
+    const bookId = CardProps.bookDetails.bookId;
+    try {
+      await removeBook({
+        variables: { bookId },
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <Card sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }} key={CardProps.bookDetails.bookId}>
       <CardActionArea>
@@ -240,8 +237,18 @@ export default function SearchBookCard({ ...CardProps }: Book) {
                 <MenuItem onClick={() => handleMenuClose("CURRENTLY_READING")}>📚 Currently Reading</MenuItem>
                 <MenuItem onClick={() => handleMenuClose("FINISHED_READING")}>✅ Finished Reading</MenuItem>
               </Menu>
+
+              {(window.location.pathname === '/favorites' || 
+              window.location.pathname === '/currently-reading' || 
+              window.location.pathname === '/want-to-read' || 
+              window.location.pathname === '/finished-reading') &&
+              <IconButton aria-label="delete" onClick={handleRemoveBook}>
+                <DeleteIcon />
+              </IconButton>
+              }
             </div>
           )}
+
         </CardContent>
       </CardActionArea>
     </Card>
