@@ -27,6 +27,9 @@ export default function MyShelfCards({ title, numbooks, image, description }: Ca
       case "Favorites":
         window.location.assign("/favorites");
         break;  
+      case "Complete the Bingo Challenge":
+        window.location.assign("/bingo");
+        break;  
     }
   }
 

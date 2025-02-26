@@ -184,7 +184,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   return (
     <Card
       sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }}
-      key={CardProps.bookDetails.bookId}
+      key={CardProps.bookDetails.bookId} 
     >
       <CardActionArea component="div">
         {/* Book Thumbnail */}
@@ -199,7 +199,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
         />
         <CardContent>
           {/* Book Title */}
-          <Typography gutterBottom variant="h6" component="div">
+          <Typography gutterBottom variant="h6" component="a" href={CardProps.bookDetails.infoLink}>
             {CardProps.bookDetails.title}
           </Typography>
 

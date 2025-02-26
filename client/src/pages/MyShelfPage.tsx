@@ -4,6 +4,7 @@ import ActionAreaCard from "../components/MyShelfCards"; // Import the reusable 
 import { GET_ME } from "../graphql/queries";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
+import { Book } from "../interfaces/Book";
 
 export default function ShelfPage() {
 
@@ -17,12 +18,33 @@ export default function ShelfPage() {
   const [wantToReadCount, setWantToReadCount] = useState("");
   const [currentlyReadingCount, setCurrentlyReadingCount] = useState("");
 
+  const [wantToReadImage, setWantToReadImage] = useState("");
+  const [currentlyReadingImage, setCurrentlyReadingImage] = useState("");
+  const [finishedReadingImage, setFinishedReadingImage] = useState("");
+  const [favoriteImage, setFavoriteImage] = useState("");
+
   useEffect(() => {
     if (data) {
       setFavoriteCount(data.me.favoriteCount);
       setFinishedReadingCount(data.me.finishedReadingCount);
       setWantToReadCount(data.me.wantToReadCount);
       setCurrentlyReadingCount(data.me.currentlyReadingCount);
+      setWantToReadImage(
+        data.me.savedBooks.filter((book: Book) => book.status === "WANT_TO_READ").length ?
+          data.me.savedBooks.filter((book: Book) => book.status === "WANT_TO_READ")[0].bookDetails.thumbnail
+        : "https://placehold.co/600x400");
+      setCurrentlyReadingImage(
+        data.me.savedBooks.filter((book: Book) => book.status === "CURRENTLY_READING").length ?
+          data.me.savedBooks.filter((book: Book) => book.status === "CURRENTLY_READING")[0].bookDetails.thumbnail
+        : "https://placehold.co/600x400");
+      setFinishedReadingImage(
+        data.me.savedBooks.filter((book: Book) => book.status === "FINISHED_READING").length ?
+          data.me.savedBooks.filter((book: Book) => book.status === "FINISHED_READING")[0].bookDetails.thumbnail
+        : "https://placehold.co/600x400");
+      setFavoriteImage(
+        data.me.savedBooks.filter((book: Book) => book.status === "FAVORITE").length ?
+          data.me.savedBooks.filter((book: Book) => book.status === "FAVORITE")[0].bookDetails.thumbnail
+        : "https://placehold.co/600x400");
     }
   }, [data])
 
@@ -34,22 +56,22 @@ export default function ShelfPage() {
     {
       title: "Want to Read",   
       numBooks: `${wantToReadCount}`, 
-      image: "https://fakeimg.pl/600x400", // Replace with actual image URL
+      image: `${wantToReadImage}`, // Replace with actual image URL
     },
     {
       title: "Currently Reading",   
       numBooks: `${currentlyReadingCount}`, 
-      image: "https://fakeimg.pl/600x400",
+      image: `${currentlyReadingImage}`,
     },
     {
       title: "Finished Reading",    
       numBooks: `${finishedReadingCount}`, 
-      image: "https://fakeimg.pl/600x400",
+      image: `${finishedReadingImage}`,
     },
     {
       title: "Favorites",    
       numBooks: `${favoriteCount}`, 
-      image: "https://fakeimg.pl/600x400",
+      image: `${favoriteImage}`,
     },
     
   ];
