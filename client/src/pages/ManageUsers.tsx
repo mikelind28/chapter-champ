@@ -9,14 +9,39 @@ export default function ManageUsers() {
       return <div> Loading.. </div>
     }
     return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <h1>Manage Users</h1>
-        {
-          data?.getUsers.map((user:User) =>{
-            return <div>{user.email}</div>
-          })
-        }
+      <div>
+        <h1> Manage Users</h1>   
+        <table className="usertable-container">
+          <thead>
+            <tr className="userheader">
+              <th> Username </th>
+              <th> Email </th>
+              <th> Current Reading </th>
+              <th> Favourite Count </th>
+              <th> Finished Reading </th>
+              <th> Want to Read </th>
+              <th> Book Count </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data?.getUsers.map((user:User) => (
+              <tr>
+                <td className="userrow">{user.username}</td>
+                <td>{user.email}</td>
+                <td>{String(user.currentlyReadingCount)}</td>
+                <td>{String(user.favoriteCount)}</td>
+                <td>{String(user.finishedReadingCount)}</td>
+                <td>{String(user.wantToReadCount)}</td>
+                <td>{String(user.bookCount)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
-  }
+  };
+  
+      
+ 
+
   
