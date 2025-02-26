@@ -51,7 +51,8 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center',}}>
           {logo && <img src={logo} alt="Logo" style={{ height: logoSize, width: "auto", marginRight: 10 }} />}
           <form onSubmit={handleSearch}>
             <TextField
@@ -61,10 +62,20 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
               sx={{ width: "300px", marginRight: "10px" }}
             />
+            
             <Button type="submit" variant="contained" color="secondary">
               Search
             </Button>
+            <Button
+              color="secondary"
+              sx={{ marginTop: 1, textTransform: "none" }}
+              onClick={() => navigate("/book-search")}
+            >
+              Advanced Search
+            </Button>
           </form>
+      
+
         </Box>       
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

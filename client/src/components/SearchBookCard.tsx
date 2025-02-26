@@ -1,17 +1,20 @@
-import React, { useState } from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
+import { useState, useEffect } from "react";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
+
 
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useMutation } from "@apollo/client";
-import { SAVE_BOOK } from "../graphql/mutations";
+import { useMutation, useApolloClient, useQuery } from "@apollo/client";
 
-import type { Book } from "../interfaces/Book";
+import { SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
+import { GET_ME } from "../graphql/queries";
+
+import type { Book, SavedBook } from '../interfaces/Book';
 
 // Mapping GraphQL status values to display names
 const statusDisplayNames: Record<string, string> = {
@@ -22,13 +25,49 @@ const statusDisplayNames: Record<string, string> = {
 };
 
 export default function SearchBookCard({ ...CardProps }: Book) {
+  const client = useApolloClient();
   const [showDescription, setShowDescription] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [readingStatus, setReadingStatus] = useState<string>("Add to"); // Default text before selecting a reading status
   const [isFavorite, setIsFavorite] = useState(false);
+  const [updateBookStatus] = useMutation(UPDATE_BOOK_STATUS, {
+    refetchQueries: [{ query: GET_ME }],
+  });
+  // Apollo query to get the user's saved books
+  const { data } = useQuery(GET_ME);
+  const savedBooks = data?.me?.savedBooks || [];
+  const isAuthenticated = !!data?.me;  // Check if the user is logged in
+  
+  const savedBook = savedBooks.find(
+    (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
+  );
+
+  // Set the reading status and favorite status when the component
+  useEffect(() => {
+    if (savedBook) {
+      setReadingStatus(savedBook.status);
+      setIsFavorite(savedBook.status === "FAVORITE");
+    }
+  }, [savedBook]);
 
   // Apollo mutation to save the book's reading status or favorite
-  const [saveBook] = useMutation(SAVE_BOOK);
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    update(cache, { data: { saveBook } }) {
+      const existingData = cache.readQuery<any>({ query: GET_ME });
+
+      if (existingData) {
+        cache.writeQuery({
+          query: GET_ME,
+          data: {
+            me: {
+              ...existingData.me,
+              savedBooks: [...existingData.me.savedBooks, saveBook],
+            },
+          },
+        });
+      }
+    },
+  });
 
   // Toggle the description visibility when clicking "Description"
   const toggleDescription = () => {
@@ -36,34 +75,56 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   };
 
   // Open the reading status menu
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
   // Select a reading status and save it to the database
   const handleMenuClose = async (status: string) => {
     setReadingStatus(status);
     setAnchorEl(null);
-
+  
+    // Verificar si el libro ya está guardado en la biblioteca del usuario
+    const existingData = client.readQuery({ query: GET_ME });
+    const bookExists = existingData?.me?.savedBooks?.some(
+      (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
+    );
+  
     try {
-      await saveBook({
-        variables: {
-          input: {
-            bookId: CardProps.bookDetails.bookId,
-            title: CardProps.bookDetails.title,
-            authors: CardProps.bookDetails.authors,
-            description: CardProps.bookDetails.description,
-            thumbnail: CardProps.bookDetails.thumbnail,
-            infoLink: CardProps.bookDetails.infoLink,
+      if (!bookExists) {
+        console.log("📚 Book not found in library. Saving first...");
+  
+        await saveBook({
+          variables: {
+            input: {
+              bookId: CardProps.bookDetails.bookId,
+              title: CardProps.bookDetails.title,
+              authors: CardProps.bookDetails.authors,
+              description: CardProps.bookDetails.description,
+              thumbnail: CardProps.bookDetails.thumbnail,
+              infoLink: CardProps.bookDetails.infoLink,
+            },
+            status: "WANT_TO_READ", // Estado inicial cuando se guarda el libro
           },
-          status,
+        });
+  
+        console.log("✅ Book saved successfully.");
+      }
+  
+      // Ahora actualizamos el estado de lectura
+      await updateBookStatus({
+        variables: {
+          bookId: CardProps.bookDetails.bookId,
+          status: status.toUpperCase().replace(/\s+/g, "_"), // Convertir a ENUM válido
         },
       });
+  
       console.log(`📚 Updated reading status: ${status}`);
     } catch (error) {
       console.error("❌ Error updating reading status:", error);
     }
   };
+  
 
   // Toggle the favorite status and save it to the database
   const toggleFavorite = async () => {
@@ -94,7 +155,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
       sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }}
       key={CardProps.bookDetails.bookId}
     >
-      <CardActionArea>
+      <CardActionArea component="div">
         {/* Book Thumbnail */}
         <CardMedia
           component="img"
@@ -134,36 +195,20 @@ export default function SearchBookCard({ ...CardProps }: Book) {
               {CardProps.bookDetails.description || "No description available."}
             </Typography>
           )}
-
-          {/* Favorite Button & Reading Status Menu */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "8px",
-            }}
-          >
-            {/* Favorite Button */}
-            <IconButton
-              onClick={toggleFavorite}
-              color={isFavorite ? "error" : "default"}
-            >
-              <FavoriteIcon />
-            </IconButton>
-
-            {/* Reading Status Selector */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Typography
-                variant="body2"
-                sx={{ marginRight: 1, fontStyle: "italic" }}
-              >
-                {readingStatus}
-              </Typography>
-              <IconButton onClick={handleMenuClick}>
-                <MoreVertIcon />
+          {isAuthenticated && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+              <IconButton onClick={toggleFavorite} color={isFavorite ? "error" : "default"}>
+                <FavoriteIcon />
               </IconButton>
-            </div>
+
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Typography variant="body2" sx={{ marginRight: 1, fontStyle: "italic" }}>
+                  {readingStatus}
+                </Typography>
+                <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
+                  <MoreVertIcon />
+                </IconButton>
+              </div>
 
             {/* Reading Status Menu */}
             <Menu
@@ -182,6 +227,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
               </MenuItem>
             </Menu>
           </div>
+          )}
         </CardContent>
       </CardActionArea>
     </Card>

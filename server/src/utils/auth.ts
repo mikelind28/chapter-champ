@@ -9,31 +9,36 @@ export const authenticateToken = ({ req }: any) => {
 
   // If the token is sent in the authorization header, extract the token from the header
   if (req.headers.authorization) {
-    token = token.split(' ').pop().trim();
+    // Handle both "Bearer <token>" and raw token
+    if (token.startsWith("Bearer ")) {
+      token = token.split(' ')[1].trim();
+    }
   }
 
   // If no token is provided, return the request object as is
   if (!token) {
+    console.log("No token provided.");
     return req;
   }
 
   // Try to verify the token
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET || '', { maxAge: '2hr' });
-    // If the token is valid, attach the user data to the request object
-    req.user = data;
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "", {
+      maxAge: "2h",
+    });
+    req.user = decoded.data;
+    console.log("Token verified. User:", req.user);
   } catch (err) {
-    // If the token is invalid, log an error message
-    console.log('Invalid token');
+    console.error("Invalid token:", err);
   }
 
   // Return the request object
   return req;
 };
 
-export const signToken = (email: string, _id: unknown, isAdmin: boolean) => {
+export const signToken = (username: string, email: string, _id: unknown, isAdmin: boolean) => {
   // Create a payload with the user information
-  const payload = { email, _id, isAdmin};
+  const payload = { username, email, _id, isAdmin};
   const secretKey: any = process.env.JWT_SECRET;
 
   // Sign the token with the payload and secret key, and set it to expire in 2 hours

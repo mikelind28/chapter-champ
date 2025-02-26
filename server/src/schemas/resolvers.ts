@@ -8,6 +8,7 @@ import {
   removeBook,
   getAllUsers,
   promoteUserToAdmin,
+  updateUserDetails,
 } from "../controllers/userController.js";
 import { searchBooks, fetchBookById } from "../controllers/bookController.js";
 
@@ -97,6 +98,22 @@ const resolvers = {
      */
     login: async (_parent: any, { email, password }: any) => {
       return await authenticateUser(email, password);
+    },
+
+    /**
+     * Updates the current user's username and email.
+     * @function updateUser
+     * @param {string} username - The new username.
+     * @param {string} email - The new email.
+     * @returns {Promise<User>} The updated user object.
+     */
+    updateUser: async (
+      _parent: any,
+      { username, email }: any,
+      context: Context
+    ) => {
+      if (!context.user) throw new Error("Authentication required.");
+      return await updateUserDetails(context.user._id, username, email);
     },
 
     /**
