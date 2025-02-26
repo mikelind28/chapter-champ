@@ -46,3 +46,17 @@ export const SEARCH_GOOGLE_BOOKS = gql`
         }
     }
 `;
+
+export const GET_USERS = gql`
+    query getUsers {
+        getUsers {
+            username
+            email
+            currentlyReadingCount
+            favoriteCount
+            finishedReadingCount
+            wantToReadCount
+            bookCount
+         }
+    }
+`;

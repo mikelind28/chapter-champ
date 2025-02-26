@@ -1,5 +1,6 @@
 import {
   getCurrentUser,
+  getUsers,
   registerUser,
   authenticateUser,
   saveBook,
@@ -34,6 +35,14 @@ const resolvers = {
      */
     me: async (_parent: any, _args: any, context: Context) => {
       return await getCurrentUser(context);
+    },
+    /**
+     * @function getUsers
+     * returns all the users
+     */
+    getUsers: async (_parent: unknown, _args: any, context: Context) => {
+      //add try catch
+      return await getUsers(context);
     },
 
     /**
