@@ -13,7 +13,7 @@
             "title": "The Great Gatsby",
             "authors": ["F. Scott Fitzgerald"],
             "description": "A novel set in the Jazz Age.",
-            "thumbnail": "http://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+            "thumbnail": "https://books.google.com/books/content?id=iXn5U2IzVH0C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
             "pageCount": 180,
             "categories": ["Classic", "Fiction"],
             "averageRating": 4.3,
@@ -28,12 +28,12 @@
             "title": "1984",
             "authors": ["George Orwell"],
             "description": "A dystopian novel exploring themes of totalitarianism and surveillance.",
-            "thumbnail": "http://books.google.com/books/content?id=uyr8BAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+            "thumbnail": "https://books.google.com/books/content?id=uyr8BAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
             "pageCount": 328,
             "categories": ["Dystopian", "Science Fiction"],
             "averageRating": 4.6,
             "ratingsCount": 4200,
-            "infoLink": "http://books.google.com/books?id=uyr8BAAAQBAJ&dq=1984&hl=&source=gbs_api"
+            "infoLink": "https://books.google.com/books?id=uyr8BAAAQBAJ&dq=1984&hl=&source=gbs_api"
           }
         }
       ]
