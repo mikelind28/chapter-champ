@@ -18,6 +18,7 @@ const typeDefs = gql`
     _id: ID!
     username: String!
     email: String!
+    isAdmin: Boolean
     savedBooks: [SavedBook]                       # User's personal library with book details and reading status
     bookCount: Int                                # Virtual property showing the total number of saved books
     favoriteCount: Int                            # Virtual property showing the total number of favorite books
@@ -104,6 +105,9 @@ const typeDefs = gql`
   type Mutation {
     # Registers a new user and returns the authentication token
     addUser(username: String!, email: String!, password: String!): Auth
+
+    # Admin: Removes a specific user and related Book information
+    removeUser(userId: ID!): User
 
     # Logs in a user and returns a signed JWT token
     login(email: String!, password: String!): Auth

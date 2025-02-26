@@ -34,6 +34,15 @@ export const UPDATE_USER = gql`
   }
 `;
 
+export const REMOVE_USER = gql`
+  mutation RemoveUser($userId: ID!) {
+    removeUser(userId: $userId) {
+      _id
+    }
+  }
+`;
+
+
 export const SAVE_BOOK = gql`
   mutation saveBook($input: BookInput!) {
     saveBook(input: $input) {

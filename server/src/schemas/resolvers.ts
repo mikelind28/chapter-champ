@@ -9,6 +9,7 @@ import {
   getAllUsers,
   promoteUserToAdmin,
   updateUserDetails,
+  deleteUser
 } from "../controllers/userController.js";
 import { searchBooks, fetchBookById } from "../controllers/bookController.js";
 
@@ -42,8 +43,12 @@ const resolvers = {
      * returns all the users
      */
     getUsers: async (_parent: any, _args: any, context: Context) => {
-      //add try catch
-      return await getUsers(context);
+      try{
+        return await getUsers(context);
+      }
+      catch (err){
+        return err;
+      }
     },
 
     /**
@@ -114,6 +119,19 @@ const resolvers = {
     ) => {
       if (!context.user) throw new Error("Authentication required.");
       return await updateUserDetails(context, username, email); // must be context
+    },
+
+    /**
+     * Removes User and related Books
+    */
+    removeUser: async (_parent: any, {userId}: any, context: Context) => {
+      //add try catch
+      try{
+        return await deleteUser(context,userId);
+      }
+      catch (err) {
+        return err;
+      }
     },
 
     /**

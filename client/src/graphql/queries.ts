@@ -58,6 +58,7 @@ export const GET_USERS = gql`
             finishedReadingCount
             wantToReadCount
             bookCount
+            isAdmin
          }
     }
 `;

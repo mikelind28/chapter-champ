@@ -1,5 +1,5 @@
 export interface User{
-        id: String;
+        _id: String;
         username: String;
         email: String;
         currentlyReadingCount: Number;
@@ -7,4 +7,5 @@ export interface User{
         finishedReadingCount: Number;
         wantToReadCount: Number;
         bookCount: Number;
+        isAdmin: Boolean;
 }
