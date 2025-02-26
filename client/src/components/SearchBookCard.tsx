@@ -1,17 +1,25 @@
 import React, { useState } from "react";
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import CardActionArea from "@mui/material/CardActionArea";
 
-import { Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useMutation } from "@apollo/client";
 import { SAVE_BOOK } from "../graphql/mutations";
 
-import type { Book } from '../interfaces/Book';
+import type { Book } from "../interfaces/Book";
+
+// Mapping GraphQL status values to display names
+const statusDisplayNames: Record<string, string> = {
+  WANT_TO_READ: "📖 Want to Read",
+  CURRENTLY_READING: "📚 Currently Reading",
+  FINISHED_READING: "✅ Finished Reading",
+  FAVORITE: "⭐ Favorite",
+};
 
 export default function SearchBookCard({ ...CardProps }: Book) {
   const [showDescription, setShowDescription] = useState(false);
@@ -82,14 +90,19 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   };
 
   return (
-    <Card sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }} key={CardProps.bookDetails.bookId}>
+    <Card
+      sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }}
+      key={CardProps.bookDetails.bookId}
+    >
       <CardActionArea>
         {/* Book Thumbnail */}
         <CardMedia
           component="img"
           height="180"
           width="100"
-          image={CardProps.bookDetails.thumbnail || "https://via.placeholder.com/150"}
+          image={
+            CardProps.bookDetails.thumbnail || "https://via.placeholder.com/150"
+          }
           alt={CardProps.bookDetails.title}
         />
         <CardContent>
@@ -109,9 +122,13 @@ export default function SearchBookCard({ ...CardProps }: Book) {
           </Typography>
 
           {/* Show description only when clicking "Description" */}
-          <Button variant="text" onClick={toggleDescription} sx={{ textTransform: "none", color: "primary.main" }}>
+          <Button
+            variant="text"
+            onClick={toggleDescription}
+            sx={{ textTransform: "none", color: "primary.main" }}
+          >
             Description
-          </Button> 
+          </Button>
           {showDescription && (
             <Typography variant="body2" sx={{ marginTop: 1 }}>
               {CardProps.bookDetails.description || "No description available."}
@@ -119,15 +136,28 @@ export default function SearchBookCard({ ...CardProps }: Book) {
           )}
 
           {/* Favorite Button & Reading Status Menu */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "8px",
+            }}
+          >
             {/* Favorite Button */}
-            <IconButton onClick={toggleFavorite} color={isFavorite ? "error" : "default"}>
+            <IconButton
+              onClick={toggleFavorite}
+              color={isFavorite ? "error" : "default"}
+            >
               <FavoriteIcon />
             </IconButton>
 
             {/* Reading Status Selector */}
             <div style={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="body2" sx={{ marginRight: 1, fontStyle: "italic" }}>
+              <Typography
+                variant="body2"
+                sx={{ marginRight: 1, fontStyle: "italic" }}
+              >
                 {readingStatus}
               </Typography>
               <IconButton onClick={handleMenuClick}>
@@ -136,10 +166,20 @@ export default function SearchBookCard({ ...CardProps }: Book) {
             </div>
 
             {/* Reading Status Menu */}
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-              <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
-              <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+            >
+              <MenuItem onClick={() => handleMenuClose("WANT_TO_READ")}>
+                {statusDisplayNames.WANT_TO_READ}
+              </MenuItem>
+              <MenuItem onClick={() => handleMenuClose("CURRENTLY_READING")}>
+                {statusDisplayNames.CURRENTLY_READING}
+              </MenuItem>
+              <MenuItem onClick={() => handleMenuClose("FINISHED_READING")}>
+                {statusDisplayNames.FINISHED_READING}
+              </MenuItem>
             </Menu>
           </div>
         </CardContent>
