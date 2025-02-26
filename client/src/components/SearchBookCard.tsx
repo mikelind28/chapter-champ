@@ -17,14 +17,6 @@ import { GET_ME } from "../graphql/queries";
 
 import type { Book, SavedBook } from '../interfaces/Book';
 
-// Mapping GraphQL status values to display names
-const statusDisplayNames: Record<string, string> = {
-  WANT_TO_READ: "📖 Want to Read",
-  CURRENTLY_READING: "📚 Currently Reading",
-  FINISHED_READING: "✅ Finished Reading",
-  FAVORITE: "⭐ Favorite",
-};
-
 export default function SearchBookCard({ ...CardProps }: Book) {
   const client = useApolloClient();
   const [showDescription, setShowDescription] = useState(false);
