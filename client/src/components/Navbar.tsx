@@ -33,6 +33,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     event.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/book-search?query=${encodeURIComponent(searchTerm)}`);
+      window.location.reload();
     }
   };
 
@@ -41,10 +42,10 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     Auth.logout();
     navigate("/"); // Redirect to home page
   }
-  if (Auth.loggedIn()) {
-    const user = Auth.getProfile();
-    console.log(user);
-  }
+  // if (Auth.loggedIn()) {
+  //   const user = Auth.getProfile();
+  //   console.log(user);
+  // }
 
   Auth.isAdmin();
 

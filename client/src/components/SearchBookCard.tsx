@@ -22,25 +22,60 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [readingStatus, setReadingStatus] = useState<string>("Add to"); // Default text before selecting a reading status
   const [isFavorite, setIsFavorite] = useState(false);
+  const [mySavedBooks, setMySavedBooks] = useState<SavedBook[]>([]);
+
   const [updateBookStatus] = useMutation(UPDATE_BOOK_STATUS, {
     refetchQueries: [{ query: GET_ME }],
   });
+
   // Apollo query to get the user's saved books
   const { data } = useQuery(GET_ME);
-  const savedBooks = data?.me?.savedBooks || [];
-  const isAuthenticated = !!data?.me;  // Check if the user is logged in
+
+  useEffect(() => {
+    if (data) {
+        setMySavedBooks(data.me.savedBooks);
+    }
+  }, [data])
+
+  useEffect(() => {
+    for (const eachBook of mySavedBooks) {
+      if (eachBook.bookDetails.bookId === CardProps.bookDetails.bookId) {
+        if (eachBook.status === "FAVORITE") {
+          setIsFavorite(true);
+        } else {
+          switch (eachBook.status) {
+            case "WANT_TO_READ":
+              setReadingStatus("Want to Read");
+              break;
+            case "CURRENTLY_READING":
+              setReadingStatus("Currently Reading");
+              break;
+            case "FINISHED_READING":
+              setReadingStatus("Finished Reading");
+              break;
+            default:
+              console.log("Error changing book status");
+          }
+        }
+      }
+    }
+  }, [CardProps, data])
+
+    // const savedBooks = data?.me?.savedBooks || [];
+    const isAuthenticated = !!data?.me;  // Check if the user is logged in
+
   
-  const savedBook = savedBooks.find(
-    (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
-  );
+  // const savedBook = savedBooks.find(
+  //   (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
+  // );
 
   // Set the reading status and favorite status when the component
-  useEffect(() => {
-    if (savedBook) {
-      setReadingStatus(savedBook.status);
-      setIsFavorite(savedBook.status === "FAVORITE");
-    }
-  }, [savedBook]);
+  // useEffect(() => {
+  //   if (savedBook) {
+  //     setReadingStatus(savedBook.status);
+  //     setIsFavorite(savedBook.status === "FAVORITE");
+  //   }
+  // }, [savedBook]);
 
   // Apollo mutation to save the book's reading status or favorite
   const [saveBook] = useMutation(SAVE_BOOK, {
@@ -73,7 +108,6 @@ export default function SearchBookCard({ ...CardProps }: Book) {
 
   // Select a reading status and save it to the database
   const handleMenuClose = async (status: string) => {
-    setReadingStatus(status);
     setAnchorEl(null);
   
     // Verificar si el libro ya está guardado en la biblioteca del usuario
@@ -94,15 +128,19 @@ export default function SearchBookCard({ ...CardProps }: Book) {
               authors: CardProps.bookDetails.authors,
               description: CardProps.bookDetails.description,
               thumbnail: CardProps.bookDetails.thumbnail,
+              pageCount: CardProps.bookDetails.pageCount,
+              categories: CardProps.bookDetails.categories,
+              // averageRating: CardProps.bookDetails.averageRating,
+              // ratingsCount: CardProps.bookDetails.averageRating,
               infoLink: CardProps.bookDetails.infoLink,
+              status: status,
             },
-            status: "WANT_TO_READ", // Estado inicial cuando se guarda el libro
           },
         });
   
         console.log("✅ Book saved successfully.");
       }
-  
+
       // Ahora actualizamos el estado de lectura
       await updateBookStatus({
         variables: {
@@ -131,9 +169,13 @@ export default function SearchBookCard({ ...CardProps }: Book) {
             authors: CardProps.bookDetails.authors,
             description: CardProps.bookDetails.description,
             thumbnail: CardProps.bookDetails.thumbnail,
+            pageCount: CardProps.bookDetails.pageCount,
+            categories: CardProps.bookDetails.categories,
+            averageRating: CardProps.bookDetails.averageRating,
+            ratingsCount: CardProps.bookDetails.averageRating,
             infoLink: CardProps.bookDetails.infoLink,
+            status: "FAVORITE",
           },
-          status: "FAVORITE",
         },
       });
       console.log(`⭐ ${CardProps.bookDetails.title} added to favorites.`);
@@ -194,9 +236,9 @@ export default function SearchBookCard({ ...CardProps }: Book) {
               </div>
 
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-                <MenuItem onClick={() => handleMenuClose("Want to Read")}>📖 Want to Read</MenuItem>
-                <MenuItem onClick={() => handleMenuClose("Currently Reading")}>📚 Currently Reading</MenuItem>
-                <MenuItem onClick={() => handleMenuClose("Finished Reading")}>✅ Finished Reading</MenuItem>
+                <MenuItem onClick={() => handleMenuClose("WANT_TO_READ")}>📖 Want to Read</MenuItem>
+                <MenuItem onClick={() => handleMenuClose("CURRENTLY_READING")}>📚 Currently Reading</MenuItem>
+                <MenuItem onClick={() => handleMenuClose("FINISHED_READING")}>✅ Finished Reading</MenuItem>
               </Menu>
             </div>
           )}

@@ -61,7 +61,6 @@ export default function SignupModal({ open, onClose }: SignupModalProps) {
   // reflect changes in form input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    console.log(name, value)
     setSignupFormData({ ...signupFormData, [name]: value });
     setLoginFormData({ ...loginFormData, [name]: value });
   };
