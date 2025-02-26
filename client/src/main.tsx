@@ -18,6 +18,7 @@ import CurrentlyReading from './pages/CurrentlyReading.tsx';
 import FinishedReading from './pages/FinishedReading.tsx';
 import Favorites from './pages/Favorites.tsx';
 import BookSearch from './pages/BookSearch.tsx';
+import Bingo from './pages/Bingo.tsx';
 
 // Material UI Theme
 const theme = createTheme({
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
       { path: "currently-reading", element: <CurrentlyReading />},
       { path: "finished-reading", element: <FinishedReading />},
       { path: "favorites", element: <Favorites />},
+      { path: "bingo", element: <Bingo />},
     ],
   },
 ]);
