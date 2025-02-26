@@ -57,14 +57,12 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     <AppBar position="static" color="primary">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
 
-      
         {isMobile && (
           <IconButton color="inherit" onClick={() => setMobileOpen(true)} sx={{ marginRight: 2 }}>
             <MenuIcon />
           </IconButton>
         )}
 
-        
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center'}}>
           {logo && <img src={logo} alt="Logo" style={{ height: logoSize, width: "auto", marginRight: 10 }} />}
           {!isMobile && (
@@ -90,20 +88,13 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
           )}
         </Box>
 
-        
-        {!isMobile && (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {links.map((link, index) => (
-              <Button key={index} color="inherit" sx={{ marginRight: 2 }} onClick={() => navigate(link.path)}>
-                {link.label}
-              </Button>
-            ))}
-          </Box>
-        )}
-
-        
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {Auth.loggedIn() && !Auth.isAdmin() && (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {!isMobile && links.map((link, index) => (
+            <Button key={index} color="inherit" sx={{ marginRight: 2 }} onClick={() => navigate(link.path)}>
+              {link.label}
+            </Button>
+          ))}
+          {!isMobile && Auth.loggedIn() && !Auth.isAdmin() && (
             <>
               <Button 
                 color="inherit"
@@ -119,15 +110,14 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
                 anchorEl={dashboardMenuEl}
                 open={Boolean(dashboardMenuEl)}
                 onClose={() => setDashboardMenuEl(null)}
-              >                
+              >
                 <MenuItem onClick={() => handleNavigate("/shelf")}>My Shelf</MenuItem>
                 <MenuItem onClick={() => handleNavigate("/account")}>My Account</MenuItem>
-                <MenuItem onClick={() => handleNavigate("/challenges")}>Challenges</MenuItem>                
+                <MenuItem onClick={() => handleNavigate("/challenges")}>Challenges</MenuItem>
               </Menu>
             </>
           )}
-
-          {Auth.loggedIn() && Auth.isAdmin() && (
+          {!isMobile && Auth.loggedIn() && Auth.isAdmin() && (
             <>
               <Button 
                 color="inherit"
@@ -143,26 +133,27 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
                 anchorEl={dashboardMenuEl}
                 open={Boolean(dashboardMenuEl)}
                 onClose={() => setDashboardMenuEl(null)}
-              >                
+              >
                 <MenuItem onClick={() => handleNavigate("/manageusers")}>Manage Users</MenuItem>
               </Menu>
             </>
           )}
-  
-          {Auth.loggedIn() ? (
+          {Auth.loggedIn() && (
             <>
-              <Button color="inherit" onClick={handleLogout}>
-                LOGOUT
-              </Button>
+              {!isMobile && (
+                <Button color="inherit" onClick={handleLogout}>
+                  LOGOUT
+                </Button>
+              )}
               <Avatar sx={{ marginLeft: 1, height: 50, width: 50 }} />
             </>
-          ) : (
+          )}
+          {!Auth.loggedIn() && !isMobile && (
             <Button color="inherit" onClick={() => setModalOpen(true)}>Login/Signup</Button>
           )}
         </Box>
       </Toolbar>
 
-     
       {isMobile && (
         <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
           <List sx={{ width: 250 }}>
@@ -206,6 +197,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
 
       <SignupModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppBar>
+
   );
 };
 
