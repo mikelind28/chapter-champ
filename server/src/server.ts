@@ -44,6 +44,16 @@ const startApolloServer = async () => {
     expressMiddleware(server, {
       context: async ({ req }: { req: Request }): Promise<ApolloContext> => {
         try {
+          // Extract the operation name (e.g., login, addUser, etc.)
+          const operationName = req.body?.operationName;
+  
+          // Skip authentication for login and addUser mutations
+          if (["login", "addUser"].includes(operationName)) {
+            console.log(`Skipping token check for ${operationName}`);
+            return { user: null };
+          }
+  
+          // For all other operations, authenticate
           const context = authenticateToken({ req });
           console.log(
             process.env.NODE_ENV === "development"

@@ -17,7 +17,7 @@ export const authenticateToken = ({ req }: any) => {
 
   // If no token is provided, return the request object as is
   if (!token) {
-    console.log("No token provided.");
+    console.log(`No token provided for ${req.body.operationName}.`);
     return req;
   }
 

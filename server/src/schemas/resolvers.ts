@@ -113,7 +113,7 @@ const resolvers = {
       context: Context
     ) => {
       if (!context.user) throw new Error("Authentication required.");
-      return await updateUserDetails(context.user._id, username, email);
+      return await updateUserDetails(context, username, email); // must be context
     },
 
     /**
