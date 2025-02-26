@@ -9,7 +9,7 @@ import {
 
 /**
  * Converts the savedBooks status field from Mongoose format to GraphQL enum.
- * 
+ *
  * @function convertUserStatusToGraphQL
  * @param {Object} user - The user object from the database.
  * @returns {Object} The user object with GraphQL-compatible status values.
@@ -32,13 +32,11 @@ const convertUserStatusToGraphQL = (user: any) => {
  * @returns {Promise<Object>} The user object with GraphQL-compatible status.
  */
 export const getUserById = async (userId: string) => {
-  const user = await UserModel.findById(userId)
-    .select("-__v -password") // Exclude sensitive fields
-    .exec(); // Ensures we return a Mongoose document fully populated
+  const user = await UserModel.findById(userId).select("-__v -password").exec();
 
   if (!user) throw new Error("User not found.");
 
-  return convertUserStatusToGraphQL(user.toObject());
+  return convertUserStatusToGraphQL(user.toJSON());
 };
 
 /**
@@ -50,7 +48,7 @@ export const getUserById = async (userId: string) => {
  */
 export const findUserByEmail = async (email: string) => {
   const user = await UserModel.findOne({ email });
-  return user ? convertUserStatusToGraphQL(user) : null;
+  return user ? convertUserStatusToGraphQL(user.toJSON()) : null;
 };
 
 /*
@@ -85,7 +83,7 @@ export const createUser = async (
 ) => {
   const user = await UserModel.create({ username, email, password });
   const token = signToken(user.email, user._id, user.isAdmin);
-  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
+  return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
 /**
@@ -105,19 +103,17 @@ export const loginUser = async (email: string, password: string) => {
   if (!isValid) throw new AuthenticationError("Wrong password!");
 
   const token = signToken(user.email, user._id, user.isAdmin);
-  return { token, user: convertUserStatusToGraphQL(user.toObject()) };
+  return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
 /**
  * Saves a book to the user's library with the specified reading status.
- * Prevents duplicates using `$addToSet`.
  *
  * @function saveBookToLibrary
  * @param {string} userId - User's ID.
  * @param {Object} bookData - Book details.
  * @param {BookStatus} status - Reading status (GraphQL enum).
  * @returns {Promise<Object>} Updated user with GraphQL-compatible status.
- * @throws {Error} If the user is not found or duplicate book exists.
  */
 export const saveBookToLibrary = async (
   userId: string,
@@ -128,15 +124,21 @@ export const saveBookToLibrary = async (
 
   const updatedUser = await UserModel.findOneAndUpdate(
     { _id: userId, "savedBooks.bookDetails.bookId": { $ne: bookData.bookId } },
-    { $addToSet: { savedBooks: { bookDetails: bookData, status: mappedStatus } } },
+    {
+      $addToSet: {
+        savedBooks: { bookDetails: bookData, status: mappedStatus },
+      },
+    },
     { new: true, runValidators: true }
   );
 
   if (!updatedUser) {
-    throw new Error("Book already exists in the user's library or user not found.");
+    throw new Error(
+      "Book already exists in the user's library or user not found."
+    );
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON());
 };
 
 /**
@@ -147,7 +149,6 @@ export const saveBookToLibrary = async (
  * @param {string} bookId - Book's ID.
  * @param {BookStatus} newStatus - New reading status (GraphQL enum).
  * @returns {Promise<Object>} Updated user with GraphQL-compatible status.
- * @throws {Error} If user or book not found.
  */
 export const updateBookStatusInLibrary = async (
   userId: string,
@@ -166,7 +167,7 @@ export const updateBookStatusInLibrary = async (
     throw new Error("Book not found in user's library or user not found.");
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON());
 };
 
 /**
@@ -176,7 +177,6 @@ export const updateBookStatusInLibrary = async (
  * @param {string} userId - User's ID.
  * @param {string} bookId - Book's ID to remove.
  * @returns {Promise<Object>} Updated user without the removed book.
- * @throws {Error} If user not found.
  */
 export const removeBookFromLibrary = async (userId: string, bookId: string) => {
   const updatedUser = await UserModel.findByIdAndUpdate(
@@ -189,5 +189,5 @@ export const removeBookFromLibrary = async (userId: string, bookId: string) => {
     throw new Error("User not found or book not in library.");
   }
 
-  return convertUserStatusToGraphQL(updatedUser.toObject());
+  return convertUserStatusToGraphQL(updatedUser.toJSON()); 
 };
