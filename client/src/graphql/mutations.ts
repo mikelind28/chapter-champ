@@ -24,6 +24,16 @@ export const ADD_USER = gql`
 }
 `;
 
+export const UPDATE_USER = gql`
+  mutation UpdateUser($username: String!, $email: String!) {
+    updateUser(username: $username, email: $email) {
+      _id
+      username
+      email
+    }
+  }
+`;
+
 export const SAVE_BOOK = gql`
   mutation saveBook($input: BookInput!) {
     saveBook(input: $input) {

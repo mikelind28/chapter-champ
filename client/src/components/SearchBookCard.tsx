@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CardActionArea from '@mui/material/CardActionArea';
 
 
-import { Button, IconButton, Menu, MenuItem } from '@mui/material';
+import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -182,14 +182,19 @@ export default function SearchBookCard({ ...CardProps }: Book) {
   }
 
   return (
-    <Card sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }} key={CardProps.bookDetails.bookId}>
-      <CardActionArea>
+    <Card
+      sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }}
+      key={CardProps.bookDetails.bookId}
+    >
+      <CardActionArea component="div">
         {/* Book Thumbnail */}
         <CardMedia
           component="img"
           height="180"
           width="100"
-          image={CardProps.bookDetails.thumbnail || "https://via.placeholder.com/150"}
+          image={
+            CardProps.bookDetails.thumbnail || "https://via.placeholder.com/150"
+          }
           alt={CardProps.bookDetails.title}
         />
         <CardContent>
@@ -209,9 +214,13 @@ export default function SearchBookCard({ ...CardProps }: Book) {
           </Typography>
 
           {/* Show description only when clicking "Description" */}
-          <Button variant="text" onClick={toggleDescription} sx={{ textTransform: "none", color: "primary.main" }}>
+          <Button
+            variant="text"
+            onClick={toggleDescription}
+            sx={{ textTransform: "none", color: "primary.main" }}
+          >
             Description
-          </Button> 
+          </Button>
           {showDescription && (
             <Typography variant="body2" sx={{ marginTop: 1 }}>
               {CardProps.bookDetails.description || "No description available."}

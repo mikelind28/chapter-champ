@@ -82,7 +82,7 @@ export const createUser = async (
   password: string
 ) => {
   const user = await UserModel.create({ username, email, password });
-  const token = signToken(user.email, user._id, user.isAdmin);
+  const token = signToken(user.username, user.email, user._id, user.isAdmin);
   return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
@@ -102,7 +102,7 @@ export const loginUser = async (email: string, password: string) => {
   const isValid = await user.isCorrectPassword(password);
   if (!isValid) throw new AuthenticationError("Wrong password!");
 
-  const token = signToken(user.email, user._id, user.isAdmin);
+  const token = signToken(user.username, user.email, user._id, user.isAdmin);
   return { token, user: convertUserStatusToGraphQL(user.toJSON()) };
 };
 
