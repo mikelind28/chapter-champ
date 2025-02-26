@@ -1,49 +1,82 @@
 import { useState, useEffect } from "react";
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import CardActionArea from '@mui/material/CardActionArea';
-
-
-import { Button, IconButton, Menu, MenuItem } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import DeleteIcon from "@mui/icons-material/Delete"
+import {
+  Card,
+  Box,
+  CardContent,
+  CardMedia,
+  Typography,
+  CardActionArea,
+  Button,
+  Modal,
+} from "@mui/material";
 import { useMutation, useApolloClient, useQuery } from "@apollo/client";
-
-import { REMOVE_BOOK, SAVE_BOOK, UPDATE_BOOK_STATUS } from "../graphql/mutations";
+import {
+  REMOVE_BOOK,
+  SAVE_BOOK,
+  UPDATE_BOOK_STATUS,
+} from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
+import type { Book, SavedBook } from "../interfaces/Book";
 
-import type { Book, SavedBook } from '../interfaces/Book';
+// Modal style
+const modalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 4,
+};
 
 export default function SearchBookCard({ ...CardProps }: Book) {
   const client = useApolloClient();
   const [showDescription, setShowDescription] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [readingStatus, setReadingStatus] = useState<string>("Add to"); // Default text before selecting a reading status
+  const [showModal, setShowModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [mySavedBooks, setMySavedBooks] = useState<SavedBook[]>([]);
+  const [readingStatus, setReadingStatus] = useState<string>("Add to");
+
+  const MAX_DESCRIPTION_LENGTH = 120;
+
+  const { data } = useQuery(GET_ME);
 
   const [updateBookStatus] = useMutation(UPDATE_BOOK_STATUS, {
     refetchQueries: [{ query: GET_ME }],
   });
 
-  // Apollo query to get the user's saved books
-  const { data } = useQuery(GET_ME);
+  const [saveBook] = useMutation(SAVE_BOOK, {
+    update(cache, { data: { saveBook } }) {
+      const existingData = cache.readQuery<any>({ query: GET_ME });
+      if (existingData) {
+        cache.writeQuery({
+          query: GET_ME,
+          data: {
+            me: {
+              ...existingData.me,
+              savedBooks: [...existingData.me.savedBooks, saveBook],
+            },
+          },
+        });
+      }
+    },
+  });
+
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [{ query: GET_ME }],
+  });
 
   useEffect(() => {
-    if (data) {
-        setMySavedBooks(data.me.savedBooks);
-    }
-  }, [data])
+    if (data) setMySavedBooks(data.me.savedBooks);
+  }, [data]);
 
   useEffect(() => {
     for (const eachBook of mySavedBooks) {
       if (eachBook.bookDetails.bookId === CardProps.bookDetails.bookId) {
-        if (eachBook.status === "FAVORITE") {
-          setIsFavorite(true);
-        } else {
+        if (eachBook.status === "FAVORITE") setIsFavorite(true);
+        else {
           switch (eachBook.status) {
             case "WANT_TO_READ":
               setReadingStatus("Want to Read");
@@ -60,206 +93,155 @@ export default function SearchBookCard({ ...CardProps }: Book) {
         }
       }
     }
-  }, [CardProps, data])
+  }, [CardProps, data]);
 
-  const isAuthenticated = !!data?.me;  // Check if the user is logged in
-
-  // Apollo mutation to save the book's reading status or favorite
-  const [saveBook] = useMutation(SAVE_BOOK, {
-    update(cache, { data: { saveBook } }) {
-      const existingData = cache.readQuery<any>({ query: GET_ME });
-
-      if (existingData) {
-        cache.writeQuery({
-          query: GET_ME,
-          data: {
-            me: {
-              ...existingData.me,
-              savedBooks: [...existingData.me.savedBooks, saveBook],
-            },
-          },
-        });
-      }
-    },
-  });
-
-  // Toggle the description visibility when clicking "Description"
-  const toggleDescription = () => {
-    setShowDescription(!showDescription);
+  const getTruncatedDescription = (description: string) => {
+    if (!description) return "No description available.";
+    return description.length <= MAX_DESCRIPTION_LENGTH
+      ? description
+      : `${description.substring(0, MAX_DESCRIPTION_LENGTH)}... `;
   };
-
-  // Select a reading status and save it to the database
-  const handleMenuClose = async (status: string) => {
-    setAnchorEl(null);
-  
-    // Verificar si el libro ya está guardado en la biblioteca del usuario
-    const existingData = client.readQuery({ query: GET_ME });
-    const bookExists = existingData?.me?.savedBooks?.some(
-      (book: SavedBook) => book.bookDetails.bookId === CardProps.bookDetails.bookId
-    );
-  
-    try {
-      if (!bookExists) {
-        console.log("📚 Book not found in library. Saving first...");
-  
-        await saveBook({
-          variables: {
-            input: {
-              bookId: CardProps.bookDetails.bookId,
-              title: CardProps.bookDetails.title,
-              authors: CardProps.bookDetails.authors,
-              description: CardProps.bookDetails.description,
-              thumbnail: CardProps.bookDetails.thumbnail,
-              pageCount: CardProps.bookDetails.pageCount,
-              categories: CardProps.bookDetails.categories,
-              // averageRating: CardProps.bookDetails.averageRating,
-              // ratingsCount: CardProps.bookDetails.averageRating,
-              infoLink: CardProps.bookDetails.infoLink,
-              status: status,
-            },
-          },
-        });
-  
-        console.log("✅ Book saved successfully.");
-      }
-
-      // Ahora actualizamos el estado de lectura
-      await updateBookStatus({
-        variables: {
-          bookId: CardProps.bookDetails.bookId,
-          status: status.toUpperCase().replace(/\s+/g, "_"), // Convertir a ENUM válido
-        },
-      });
-  
-      console.log(`📚 Updated reading status: ${status}`);
-    } catch (error) {
-      console.error("❌ Error updating reading status:", error);
-    }
-  };
-  
-
-  // Toggle the favorite status and save it to the database
-  const toggleFavorite = async () => {
-    setIsFavorite(!isFavorite);
-
-    try {
-      await saveBook({
-        variables: {
-          input: {
-            bookId: CardProps.bookDetails.bookId,
-            title: CardProps.bookDetails.title,
-            authors: CardProps.bookDetails.authors,
-            description: CardProps.bookDetails.description,
-            thumbnail: CardProps.bookDetails.thumbnail,
-            pageCount: CardProps.bookDetails.pageCount,
-            categories: CardProps.bookDetails.categories,
-            averageRating: CardProps.bookDetails.averageRating,
-            ratingsCount: CardProps.bookDetails.averageRating,
-            infoLink: CardProps.bookDetails.infoLink,
-            status: "FAVORITE",
-          },
-        },
-      });
-      console.log(`⭐ ${CardProps.bookDetails.title} added to favorites.`);
-    } catch (error) {
-      console.error("❌ Error saving to favorites:", error);
-    }
-  };
-
-  const [removeBook] = useMutation(REMOVE_BOOK, {
-    refetchQueries: [{ query: GET_ME }],
-  });
-
-  const handleRemoveBook = async () => {
-    const bookId = CardProps.bookDetails.bookId;
-    try {
-      await removeBook({
-        variables: { bookId },
-        });
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
-    <Card
-      sx={{ maxWidth: 300, cursor: "pointer", position: "relative" }}
-      key={CardProps.bookDetails.bookId}
-    >
-      <CardActionArea component="div">
-        {/* Book Thumbnail */}
-        <CardMedia
-          component="img"
-          height="180"
-          width="100"
-          image={
-            CardProps.bookDetails.thumbnail || "https://via.placeholder.com/150"
-          }
-          alt={CardProps.bookDetails.title}
-        />
-        <CardContent>
-          {/* Book Title */}
-          <Typography gutterBottom variant="h6" component="div">
+    <>
+      <Card
+        sx={{
+          width: 280,
+          height: 520,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          cursor: "pointer",
+          position: "relative",
+          boxShadow: 3,
+        }}
+        key={CardProps.bookDetails.bookId}
+      >
+        <CardActionArea component="div" sx={{ height: "100%" }}>
+          {/* Book Thumbnail */}
+          <CardMedia
+            component="img"
+            sx={{
+              height: 220,
+              width: "100%",
+              objectFit: "contain",
+              backgroundColor: "#f5f5f5",
+              padding: "10px",
+            }}
+            image={
+              CardProps.bookDetails.thumbnail ||
+              "/src/assets/images/no-image.png"
+            }
+            alt={CardProps.bookDetails.title}
+            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/src/assets/images/no-image.png";
+            }}
+          />
+
+          <CardContent
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            {/* Book Title */}
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="div"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                fontWeight: 600,
+              }}
+            >
+              {CardProps.bookDetails.title}
+            </Typography>
+
+            {/* Book Authors */}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.875rem" }}
+            >
+              {CardProps.bookDetails.authors?.[0] || "Unknown Author"}
+            </Typography>
+
+            {/* Book Categories */}
+            <Typography variant="body2" color="text.primary" sx={{ mb: 1 }}>
+              {CardProps.bookDetails.categories?.join(", ") || "Uncategorized"}
+            </Typography>
+
+            {/* Description with "Read More" */}
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {getTruncatedDescription(CardProps.bookDetails.description)}
+              {CardProps.bookDetails.description &&
+                CardProps.bookDetails.description.length >
+                  MAX_DESCRIPTION_LENGTH && (
+                  <Button
+                    variant="text"
+                    size="small"
+                    sx={{ textTransform: "none", padding: 0 }}
+                    onClick={() => setShowModal(true)}
+                  >
+                    Read More
+                  </Button>
+                )}
+            </Typography>
+
+            {/* Buttons Side by Side */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 1,
+                flexWrap: "wrap",
+                mt: 1,
+              }}
+            >
+              <Button
+                variant="outlined"
+                size="small"
+                href={CardProps.bookDetails.infoLink.replace(
+                  "http://",
+                  "https://"
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ textTransform: "none", flex: "1 1 45%" }}
+              >
+                View on Google Books
+              </Button>
+            </Box>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      {/* Modal for Full Description */}
+      <Modal open={showModal} onClose={() => setShowModal(false)}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" component="h2" gutterBottom>
             {CardProps.bookDetails.title}
           </Typography>
-
-          {/* Book Authors */}
-          <Typography variant="body2" color="text.secondary">
-            {CardProps.bookDetails.authors?.join(", ") || "Unknown Author"}
+          <Typography variant="body2">
+            {CardProps.bookDetails.description || "No description available."}
           </Typography>
-
-          {/* Book Categories */}
-          <Typography variant="body2" color="text.primary">
-            {CardProps.bookDetails.categories?.join(", ") || "Uncategorized"}
-          </Typography>
-
-          {/* Show description only when clicking "Description" */}
           <Button
-            variant="text"
-            onClick={toggleDescription}
-            sx={{ textTransform: "none", color: "primary.main" }}
+            onClick={() => setShowModal(false)}
+            variant="contained"
+            sx={{ mt: 2 }}
+            fullWidth
           >
-            Description
+            Close
           </Button>
-          {showDescription && (
-            <Typography variant="body2" sx={{ marginTop: 1 }}>
-              {CardProps.bookDetails.description || "No description available."}
-            </Typography>
-          )}
-          {isAuthenticated && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
-              <IconButton onClick={toggleFavorite} color={isFavorite ? "error" : "default"}>
-                <FavoriteIcon />
-              </IconButton>
-
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Typography variant="body2" sx={{ marginRight: 1, fontStyle: "italic" }}>
-                  {readingStatus}
-                </Typography>
-                <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
-                  <MoreVertIcon />
-                </IconButton>
-              </div>
-
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-                <MenuItem onClick={() => handleMenuClose("WANT_TO_READ")}>📖 Want to Read</MenuItem>
-                <MenuItem onClick={() => handleMenuClose("CURRENTLY_READING")}>📚 Currently Reading</MenuItem>
-                <MenuItem onClick={() => handleMenuClose("FINISHED_READING")}>✅ Finished Reading</MenuItem>
-              </Menu>
-
-              {(window.location.pathname === '/favorites' || 
-              window.location.pathname === '/currently-reading' || 
-              window.location.pathname === '/want-to-read' || 
-              window.location.pathname === '/finished-reading') &&
-              <IconButton aria-label="delete" onClick={handleRemoveBook}>
-                <DeleteIcon />
-              </IconButton>
-              }
-            </div>
-          )}
-
-        </CardContent>
-      </CardActionArea>
-    </Card>
+        </Box>
+      </Modal>
+    </>
   );
 }
