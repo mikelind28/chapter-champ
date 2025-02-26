@@ -50,3 +50,37 @@ body {
     }
 }
 
+/* Manage Users specific Properties */
+h1 {
+    font-size: 2.5em;
+    text-align: center;
+}
+
+.usertable-container {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 80%;
+    background-color: #f9f9f9;
+    border-spacing: 5px;
+    margin: 0 auto;
+ }
+
+.usertable-container th {
+    padding: 10px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: rgb(41, 63, 188);
+    font-weight: bold;
+    border: 1px solid black;
+}
+
+.usertable-container td {
+    text-align: center;
+    padding: 10px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid black;
+}

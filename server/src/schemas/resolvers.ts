@@ -41,7 +41,7 @@ const resolvers = {
      * @function getUsers
      * returns all the users
      */
-    getUsers: async (_parent: unknown, _args: any, context: Context) => {
+    getUsers: async (_parent: any, _args: any, context: Context) => {
       //add try catch
       return await getUsers(context);
     },
