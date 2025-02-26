@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import SignupModal from "./signupModal";
 
 // Material UI imports
-import { AppBar, Toolbar, Menu, MenuItem, Button, Box, Avatar, TextField, useMediaQuery, Drawer, List, ListItem, ListItemText, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Menu, MenuItem, Button, Box, Avatar, TextField, useMediaQuery, Drawer, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogActions, DialogContent } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
 
 import Auth from '../utils/auth'
 
@@ -22,6 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const [modalOpen, setModalOpen] = useState(false);
   // const [loggedIn, setLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const[mobileOpen, setMobileOpen] = useState(false);
 
  
@@ -37,9 +39,17 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/book-search?query=${encodeURIComponent(searchTerm)}`);
+      const searchUrl = `/book-search?query=${encodeURIComponent(searchTerm)}`;
+  
+      if (location.pathname === "/book-search") {
+        navigate(searchUrl, { replace: true }); // Fuerza un re-render
+        window.location.reload(); // Asegura que el componente se recargue
+      } else {
+        navigate(searchUrl);
+      }
     }
   };
+  
 
   const handleLogout = () => {
     setDashboardMenuEl(null); // Close menu after
@@ -89,6 +99,11 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {isMobile && (
+            <IconButton color="inherit" onClick={() => setSearchOpen(true)}>
+              <SearchIcon />
+            </IconButton>
+          )}
           {!isMobile && links.map((link, index) => (
             <Button key={index} color="inherit" sx={{ marginRight: 2 }} onClick={() => navigate(link.path)}>
               {link.label}
@@ -153,6 +168,23 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
           )}
         </Box>
       </Toolbar>
+
+      <Dialog open={searchOpen} onClose={() => setSearchOpen(false)}>
+        <DialogTitle>Search Books</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            color="secondary"
+            label="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSearchOpen(false)}>Cancel</Button>
+          <Button onClick={handleSearch} variant="contained" color="secondary">Search</Button>
+        </DialogActions>
+      </Dialog>
 
       {isMobile && (
         <Drawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
