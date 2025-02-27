@@ -12,7 +12,12 @@ interface CardProps {
   image?: string;
 }
 
-export default function MyShelfCards({ title, numbooks, image, description }: CardProps) {
+export default function MyShelfCards({
+  title,
+  numbooks,
+  image,
+  description,
+}: CardProps) {
   const handleClick = () => {
     switch (title) {
       case "Want to Read":
@@ -23,36 +28,45 @@ export default function MyShelfCards({ title, numbooks, image, description }: Ca
         break;
       case "Finished Reading":
         window.location.assign("/finished-reading");
-        break;    
+        break;
       case "Favorites":
         window.location.assign("/favorites");
-        break;  
+        break;
       case "Complete the Bingo Challenge":
         window.location.assign("/bingo");
-        break;  
+        break;
     }
-  }
+  };
+
 
   return (
-    <Card sx={{ maxWidth: 345 }} onClick={handleClick}>
+    <Card sx={{ maxWidth: 250, cursor: "pointer", boxShadow: 3 }} onClick={handleClick}>
       <CardActionArea>
         <CardMedia
           component="img"
-          height="140"
-          width="340"
-          image={image}
+          sx={{
+            height: 180,
+            width: "100%",
+            objectFit: "contain",
+            backgroundColor: "#f5f5f5",
+            padding: "10px",
+          }}
+          image={image || "/src/assets/images/no-image.png"}
           alt={title}
+          onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/src/assets/images/no-image.png";
+          }}
         />
-
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h6" component="div" textAlign="center">
             {title}
           </Typography>
-            <Typography variant="body2" color="text.secondary">
-                {description}
-            </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {numbooks} 
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            {description}
+          </Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary", textAlign: "center", mt: 1 }}>
+            {numbooks}
           </Typography>
         </CardContent>
       </CardActionArea>
