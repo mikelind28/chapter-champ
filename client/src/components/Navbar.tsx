@@ -39,6 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchTerm.trim()) {
+<<<<<<< HEAD
       const searchUrl = `/book-search?query=${encodeURIComponent(searchTerm)}`;
   
       if (location.pathname === "/book-search") {
@@ -47,6 +48,10 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
       } else {
         navigate(searchUrl);
       }
+=======
+      navigate(`/book-search?query=${encodeURIComponent(searchTerm)}`);
+      window.location.reload();
+>>>>>>> fda10dcdb303c0404b15756247ba20532a204a20
     }
   };
   
@@ -56,10 +61,10 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     Auth.logout();
     navigate("/"); // Redirect to home page
   }
-  if (Auth.loggedIn()) {
-    const user = Auth.getProfile();
-    console.log(user);
-  }
+  // if (Auth.loggedIn()) {
+  //   const user = Auth.getProfile();
+  //   console.log(user);
+  // }
 
   Auth.isAdmin();
 

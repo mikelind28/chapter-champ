@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { GET_ME } from "../graphql/queries";
 import { useEffect, useState } from "react";
 import type { Book } from "../interfaces/Book";
-import BookCard from '../components/BookCard';
+import SearchBookCard from "../components/SearchBookCard";
 
 export default function Favorites() {
     const { loading, error, data } = useQuery(GET_ME);
@@ -24,7 +24,7 @@ export default function Favorites() {
             <h2 style={{textAlign: "center"}}>My Favorite Books:</h2>
             {bookArray.length && bookArray.map((eachBook) => {
                 return (
-                    <BookCard {...eachBook} />
+                    <SearchBookCard {...eachBook} />
                 )
             })}
         </>

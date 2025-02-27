@@ -108,6 +108,9 @@ const typeDefs = gql`
     # Logs in a user and returns a signed JWT token
     login(email: String!, password: String!): Auth
 
+    # Updates the current user's username and email
+    updateUser(username: String!, email: String!): User
+
     # Saves a book to the user's library with a specified reading status
     saveBook(input: BookInput!): User
 

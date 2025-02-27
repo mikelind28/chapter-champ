@@ -1,6 +1,7 @@
 export interface User{
+        id: String;
         username: String;
-        email: String
+        email: String;
         currentlyReadingCount: Number;
         favoriteCount: Number;
         finishedReadingCount: Number;
