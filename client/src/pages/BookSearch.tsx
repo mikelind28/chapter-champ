@@ -16,7 +16,7 @@ const BookSearch: React.FC = () => {
   // State to handle Drawer visibility on mobile
   const [openDrawer, setOpenDrawer] = useState(false);
 
-  // obtain query, author, and genre from URL
+  // Obtain query, author, and genre from URL
   const query = searchParams.get("query") || "";
   const author = searchParams.get("author") || "";
   const genre = searchParams.get("genre") || "";
@@ -25,12 +25,11 @@ const BookSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState(query);
   const [authorQuery, setAuthorQuery] = useState(author);
   const [genreQuery, setGenreQuery] = useState(genre);
-  const [searchTriggered, setSearchTriggered] = useState(false);
 
   // GraphQL query to search Google Books
   const { loading, error, data } = useQuery(SEARCH_GOOGLE_BOOKS, {
-    variables: { query: searchQuery},
-    skip: !searchTriggered,
+    variables: { query: searchQuery, author: authorQuery, genre: genreQuery },
+    skip: !searchQuery,
   });
 
   // Manages the search functionality
@@ -40,7 +39,6 @@ const BookSearch: React.FC = () => {
     if (authorQuery) params.set("author", authorQuery);
     if (genreQuery) params.set("genre", genreQuery);
     navigate(`/book-search?${params.toString()}`);
-    setSearchTriggered(true);
   };
 
   return (

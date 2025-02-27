@@ -42,8 +42,8 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
       const searchUrl = `/book-search?query=${encodeURIComponent(searchTerm)}`;
   
       if (location.pathname === "/book-search") {
-        navigate(searchUrl, { replace: true }); // Fuerza un re-render
-        window.location.reload(); // Asegura que el componente se recargue
+        navigate(searchUrl, { replace: true }); // Replace the current URL
+        window.location.reload(); // Reload the page to trigger a new search
       } else {
         navigate(searchUrl);
       }
