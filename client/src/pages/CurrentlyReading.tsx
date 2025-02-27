@@ -22,7 +22,7 @@ export default function CurrentlyReading() {
     return (
         <>
             <h2 style={{textAlign: "center"}}>Currently Reading:</h2>
-            {bookArray.length && bookArray.map((eachBook) => {
+            {bookArray.length > 0 && bookArray.map((eachBook) => {
                 return (
                     <SearchBookCard {...eachBook} />
                 )

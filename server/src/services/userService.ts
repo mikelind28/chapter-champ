@@ -191,3 +191,13 @@ export const removeBookFromLibrary = async (userId: string, bookId: string) => {
 
   return convertUserStatusToGraphQL(updatedUser.toJSON()); 
 };
+
+/**
+ * Removes a user and related books by User ID.
+ */
+export const removeUser = async (userId: string) => {
+  const user = await UserModel.findByIdAndDelete( {_id:userId} );
+  if (!user) {
+    throw new Error("User not found");
+  }
+}

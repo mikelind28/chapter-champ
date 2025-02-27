@@ -3,7 +3,7 @@ import {
   getUserById,
   createUser,
   loginUser,
-  //findUsers,
+  removeUser,
   saveBookToLibrary,
   updateBookStatusInLibrary,
   removeBookFromLibrary,
@@ -105,6 +105,19 @@ export const updateUserDetails = async (
     throw new Error("User not found or update failed.");
   }
   return updatedUser;
+};
+
+/**
+ * Deletes a User and related Books from the database.
+ * @function deleteUser
+ */
+export const deleteUser = async (context: any, userId: string) => {
+  try {
+    ensureAdmin(context);
+    return await removeUser(userId);
+  } catch (err) {
+    return err;
+  }
 };
 
 /**
