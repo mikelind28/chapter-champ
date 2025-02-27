@@ -14,5 +14,12 @@ export default defineConfig({
         secure: false,
       },
     },
+    fs: {
+      allow: [
+        'node_modules/slick-carousel/slick/fonts', // Explicitly allow access to slick-carousel fonts
+        'public',  // Ensure static assets in public are accessible
+        'src'      // Allow access to source files
+      ]
+    }
   },
 });
