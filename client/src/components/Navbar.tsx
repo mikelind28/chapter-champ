@@ -107,7 +107,6 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
                 <MenuItem onClick={() => handleNavigate("/shelf")}>My Shelf</MenuItem>
                 <MenuItem onClick={() => handleNavigate("/account")}>My Account</MenuItem>
                 <MenuItem onClick={() => handleNavigate("/challenges")}>Challenges</MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </>
           )}
