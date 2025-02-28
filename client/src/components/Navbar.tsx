@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SignupModal from "./signupModal";
+import { ColorModeContext } from "../App";
 
 // Material UI imports
 import { AppBar, Toolbar, Menu, MenuItem, Button, Box, Avatar, TextField, useMediaQuery, Drawer, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogActions, DialogContent } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
 import Auth from '../utils/auth'
 
@@ -26,6 +29,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const[mobileOpen, setMobileOpen] = useState(false);
 
+  const { mode, toggleColorMode } = useContext(ColorModeContext);
  
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 906px)");
@@ -99,6 +103,9 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={toggleColorMode} color="inherit">
+            {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
           {isMobile && (
             <IconButton color="inherit" onClick={() => setSearchOpen(true)}>
               <SearchIcon />
@@ -159,7 +166,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
                 <Button color="inherit" onClick={handleLogout}>
                   LOGOUT
                 </Button>
-              )}
+              )}              
               <Avatar sx={{ marginLeft: 1, height: 50, width: 50 }} />
             </>
           )}
@@ -191,36 +198,36 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
           <List sx={{ width: 250 }}>
             {links.map((link, index) => (
               <ListItem component={Button} key={index} onClick={() => handleNavigate(link.path)}>
-                <ListItemText primary={link.label} />
+                <ListItemText primary={link.label} sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
               </ListItem>
             ))}
             {Auth.loggedIn() && (
               Auth.isAdmin() ? (
                 <ListItem component={Button} onClick={() => handleNavigate("/manageusers")}>
-                  <ListItemText primary="Manage Users" />
+                  <ListItemText primary="Manage Users" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
                 </ListItem>
               ) : (
                 <>
                   <ListItem component={Button} onClick={() => handleNavigate("/shelf")}>
-                    <ListItemText primary="My Shelf" />
+                    <ListItemText primary="My Shelf" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
                   </ListItem>
                   <ListItem component={Button} onClick={() => handleNavigate("/account")}>
-                    <ListItemText primary="My Account" />
+                    <ListItemText primary="My Account" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
                   </ListItem>
                   <ListItem component={Button} onClick={() => handleNavigate("/challenges")}>
-                    <ListItemText primary="Challenges" />
+                    <ListItemText primary="Challenges" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
                   </ListItem>
                 </>
               )
             )}
             {Auth.loggedIn() && (
               <ListItem component={Button} onClick={handleLogout}>
-                <ListItemText primary="Logout" />
+                <ListItemText primary="Logout" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
               </ListItem>
             )}
             {!Auth.loggedIn() && (
               <ListItem component={Button} onClick={() => setModalOpen(true)}>
-                <ListItemText primary="Login/Signup" />
+                <ListItemText primary="Login/Signup" sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
               </ListItem>
             )}
           </List>
