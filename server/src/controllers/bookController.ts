@@ -1,5 +1,6 @@
 import { getGoogleBookById } from "../services/bookService.js";
 import fetch from "node-fetch";
+import { createError } from "../middleware/errorHandler.js";
 
 /**
  * Searches books using the Google Books API.
@@ -9,15 +10,29 @@ import fetch from "node-fetch";
  */
 export const searchBooks = async (query: string) => {
   try {
+    if (!query) {
+      throw createError("Search query is required", 400);
+    }
+
     const response = await fetch(
       `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
         query
       )}`
     );
-    if (!response.ok)
-      throw new Error("Failed to fetch data from Google Books API");
+
+    if (!response.ok) {
+      throw createError(
+        "Failed to fetch data from Google Books API",
+        response.status
+      );
+    }
 
     const data = await response.json();
+
+    if (!data.items || data.items.length === 0) {
+      throw createError("No books found for the given query", 404);
+    }
+
     return data.items.map((item: any) => ({
       bookId: item.id,
       title: item.volumeInfo.title || "No title available",
@@ -30,9 +45,12 @@ export const searchBooks = async (query: string) => {
       ratingsCount: item.volumeInfo.ratingsCount || 0,
       infoLink: item.volumeInfo.infoLink || "",
     }));
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    throw new Error("Failed to fetch books from Google Books API");
+  } catch (error: any) {
+    console.error("Error fetching books:", error.message);
+    throw createError(
+      error.message || "Failed to fetch books",
+      error.statusCode || 500
+    );
   }
 };
 
@@ -44,9 +62,22 @@ export const searchBooks = async (query: string) => {
  */
 export const fetchBookById = async (volumeId: string) => {
   try {
-    return await getGoogleBookById(volumeId);
-  } catch (error) {
-    console.error(`Error fetching book with ID ${volumeId}:`, error);
-    throw new Error("Failed to fetch book details from Google Books API");
+    if (!volumeId) {
+      throw createError("Volume ID is required", 400);
+    }
+
+    const book = await getGoogleBookById(volumeId);
+
+    if (!book) {
+      throw createError(`No book found with ID: ${volumeId}`, 404);
+    }
+
+    return book;
+  } catch (error: any) {
+    console.error(`Error fetching book with ID ${volumeId}:`, error.message);
+    throw createError(
+      error.message || "Failed to fetch book details",
+      error.statusCode || 500
+    );
   }
 };

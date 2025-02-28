@@ -1,7 +1,9 @@
 import { Schema, type Document } from "mongoose";
 
 /**
- * BookDocument interface representing a book's structure.
+ * @interface BookDocument
+ * Represents a book stored in a user's library.
+ * This schema is used as a subdocument within the User model.
  */
 export interface BookDocument extends Document {
   bookId: string;
@@ -17,53 +19,54 @@ export interface BookDocument extends Document {
 }
 
 /**
- * bookSchema - defines the structure for the Book subdocument.
+ * @constant bookSchema
+ * Defines the structure for the Book subdocument in the User model.
  */
 const bookSchema = new Schema<BookDocument>(
   {
     bookId: {
       type: String,
-      required: true,
+      required: [true, "Book ID is required."], // Ensures book has a valid ID
     },
     title: {
       type: String,
-      required: true,
+      required: [true, "Title is required."], // Ensures book has a valid title
     },
     authors: {
       type: [String],
-      default: [],
+      default: [], // Defaults to an empty array if no authors are provided
     },
     description: {
       type: String,
-      default: "No description available.",
+      default: "No description available.", // Fallback for missing descriptions
     },
     thumbnail: {
       type: String,
-      default: "",
+      default: "", // Empty string if no thumbnail is available
     },
     pageCount: {
       type: Number,
-      default: 0,
+      default: 0, // Default to 0 if page count is unknown
     },
     categories: {
       type: [String],
-      default: [],
+      default: [], // Defaults to an empty array if no categories are provided
     },
     averageRating: {
       type: Number,
-      default: 0,
+      default: 0, // Default rating is 0 if none exists
     },
     ratingsCount: {
       type: Number,
-      default: 0,
+      default: 0, // Default to 0 if no ratings exist
     },
     infoLink: {
       type: String,
-      default: "",
+      default: "", // Empty string if no external link is available
     },
   },
   {
-    _id: false,
+    _id: false, // Prevents a unique _id for each book entry in a user's collection
   }
 );
 
