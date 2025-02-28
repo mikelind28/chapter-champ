@@ -1,18 +1,25 @@
-import type { Request, Response } from 'express';
-import express from 'express';
+import type { Response } from "express";
+import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const router = express.Router();
 
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+// Resolve __dirname in ES module environment
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import apiRoutes from './api/serverAPI.js';
 
-router.use('/api', apiRoutes);
-
-// serve up react front-end in production
-router.use((_req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+/**
+ * Serves the frontend in production.
+ * If the requested route is not found, it falls back to serving the React `index.html`.
+ */
+router.use((_req, res: Response) => {
+  try {
+    res.sendFile(path.join(__dirname, "../../client/build/index.html"));
+  } catch (error) {
+    console.error("Error serving frontend:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
 
 export default router;

@@ -9,9 +9,10 @@ import {
   getAllUsers,
   promoteUserToAdmin,
   updateUserDetails,
-  deleteUser
+  deleteUser,
 } from "../controllers/userController.js";
 import { searchBooks, fetchBookById } from "../controllers/bookController.js";
+import { createError } from "../middleware/errorHandler.js";
 
 interface SearchGoogleBooksArgs {
   query: string;
@@ -36,28 +37,37 @@ const resolvers = {
      * @returns {Promise<User>} User data excluding sensitive fields.
      */
     me: async (_parent: any, _args: any, context: Context) => {
-      return await getCurrentUser(context);
-    },
-    /**
-     * @function getUsers
-     * returns all the users
-     */
-    getUsers: async (_parent: any, _args: any, context: Context) => {
-      try{
-        return await getUsers(context);
-      }
-      catch (err){
-        return err;
+      try {
+        return await getCurrentUser(context);
+      } catch (error: any) {
+        throw createError(`Failed to retrieve user: ${error.message}`, 500);
       }
     },
 
     /**
-     * Admin-only: Retrieves all users in the system.
+     * Retrieves all users in the system (Admin-only). F
+     * @function getUsers
+     * @returns {Promise<Array>} Array of user data.
+     */
+    getUsers: async (_parent: any, _args: any, context: Context) => {
+      try {
+        return await getUsers(context);
+      } catch (error: any) {
+        throw createError(`Error fetching users: ${error.message}`, 500);
+      }
+    },
+
+    /**
+     * Admin-only: Retrieves all users in the system. Future use.
      * @function getAllUsers
      * @returns {Promise<Array>} Array of user data.
      */
     getAllUsers: async (_parent: any, _args: any, context: Context) => {
-      return await getAllUsers(context);
+      try {
+        return await getAllUsers(context);
+      } catch (error: any) {
+        throw createError(`Error retrieving all users: ${error.message}`, 500);
+      }
     },
 
     /**
@@ -69,7 +79,11 @@ const resolvers = {
       _parent: any,
       { query }: SearchGoogleBooksArgs
     ) => {
-      return await searchBooks(query);
+      try {
+        return await searchBooks(query);
+      } catch (error: any) {
+        throw createError(`Book search failed: ${error.message}`, 500);
+      }
     },
 
     /**
@@ -81,7 +95,11 @@ const resolvers = {
       _parent: any,
       { volumeId }: { volumeId: string }
     ) => {
-      return await fetchBookById(volumeId);
+      try {
+        return await fetchBookById(volumeId);
+      } catch (error: any) {
+        throw createError(`Error fetching book details: ${error.message}`, 500);
+      }
     },
   },
 
@@ -92,24 +110,29 @@ const resolvers = {
      * @returns {Promise<{ token: string; user: User }>} The user object with a signed JWT.
      */
     addUser: async (_parent: any, { username, email, password }: any) => {
-      return await registerUser(username, email, password);
+      try {
+        return await registerUser(username, email, password);
+      } catch (error: any) {
+        throw createError(`User registration failed: ${error.message}`, 400);
+      }
     },
 
     /**
      * Authenticates a user and returns a signed JWT token.
      * @function login
      * @returns {Promise<{ token: string; user: User }>} The authenticated user and token.
-     * @throws {AuthenticationError} If user credentials are invalid.
      */
     login: async (_parent: any, { email, password }: any) => {
-      return await authenticateUser(email, password);
+      try {
+        return await authenticateUser(email, password);
+      } catch (error: any) {
+        throw createError(`Authentication failed: ${error.message}`, 401);
+      }
     },
 
     /**
      * Updates the current user's username and email.
      * @function updateUser
-     * @param {string} username - The new username.
-     * @param {string} email - The new email.
      * @returns {Promise<User>} The updated user object.
      */
     updateUser: async (
@@ -117,40 +140,44 @@ const resolvers = {
       { username, email }: any,
       context: Context
     ) => {
-      if (!context.user) throw new Error("Authentication required.");
-      return await updateUserDetails(context, username, email); // must be context
+      try {
+        if (!context.user) throw createError("Authentication required.", 401);
+        return await updateUserDetails(context, username, email);
+      } catch (error: any) {
+        throw createError(`Error updating user: ${error.message}`, 400);
+      }
     },
 
     /**
-     * Removes User and related Books
-    */
-    removeUser: async (_parent: any, {userId}: any, context: Context) => {
-      //add try catch
-      try{
-        return await deleteUser(context,userId);
-      }
-      catch (err) {
-        return err;
+     * Deletes a user and their related books (Admin-only).
+     * @function removeUser
+     * @returns {Promise<User>} The deleted user.
+     */
+    removeUser: async (_parent: any, { userId }: any, context: Context) => {
+      try {
+        return await deleteUser(context, userId);
+      } catch (error: any) {
+        throw createError(`Error removing user: ${error.message}`, 500);
       }
     },
 
     /**
      * Saves a book to the user's library with a specified reading status.
      * @function saveBook
-     * @param {BookInput} input - The book details input.
-     * @param {string} status - The reading status (GraphQL Enum).
      * @returns {Promise<User>} The updated user object.
      */
     saveBook: async (_parent: any, { input }: any, context: Context) => {
-      const { status, ...bookDetails } = input;
-      return await saveBook(context, bookDetails, status);
+      try {
+        const { status, ...bookDetails } = input;
+        return await saveBook(context, bookDetails, status);
+      } catch (error: any) {
+        throw createError(`Error saving book: ${error.message}`, 500);
+      }
     },
 
     /**
-     * Updates the reading status of a saved book in the user's library.
+     * Updates the reading status of a saved book.
      * @function updateBookStatus
-     * @param {string} bookId - The ID of the book to update.
-     * @param {string} status - The new reading status (GraphQL Enum).
      * @returns {Promise<User>} The updated user object.
      */
     updateBookStatus: async (
@@ -158,27 +185,37 @@ const resolvers = {
       { bookId, status }: any,
       context: Context
     ) => {
-      return await updateBookStatus(context, bookId, status);
+      try {
+        return await updateBookStatus(context, bookId, status);
+      } catch (error: any) {
+        throw createError(`Error updating book status: ${error.message}`, 500);
+      }
     },
 
     /**
-     * Removes a book from the user's library by its ID.
+     * Removes a book from the user's library.
      * @function removeBook
-     * @param {string} bookId - The ID of the book to remove.
      * @returns {Promise<User>} The updated user object after the book removal.
      */
     removeBook: async (_parent: any, { bookId }: any, context: Context) => {
-      return await removeBook(context, bookId);
+      try {
+        return await removeBook(context, bookId);
+      } catch (error: any) {
+        throw createError(`Error removing book: ${error.message}`, 500);
+      }
     },
 
     /**
-     * Admin-only: Promotes a user to admin status.
+     * Admin-only: Promotes a user to admin status. Future use.
      * @function promoteUser
-     * @param {string} userId - The ID of the user to promote.
      * @returns {Promise<User>} Updated user with admin privileges.
      */
     promoteUser: async (_parent: any, { userId }: any, context: Context) => {
-      return await promoteUserToAdmin(context, userId);
+      try {
+        return await promoteUserToAdmin(context, userId);
+      } catch (error: any) {
+        throw createError(`Error promoting user: ${error.message}`, 500);
+      }
     },
   },
 };

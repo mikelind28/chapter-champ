@@ -8,27 +8,27 @@ import {
   updateBookStatusInLibrary,
   removeBookFromLibrary,
 } from "../services/userService.js";
-import { AuthenticationError, ForbiddenError } from "apollo-server-express";
 import User from "../models/User.js";
+import { createError } from "../middleware/errorHandler.js";
 
 /**
  * Ensures the current user is authenticated.
  * @param {Object} context - GraphQL context (includes user info).
- * @throws {AuthenticationError} If the user is not logged in.
+ * @throws {Error} If the user is not logged in.
  */
 const ensureAuthenticated = (context: any) => {
-  if (!context.user) throw new AuthenticationError("You must be logged in.");
+  if (!context.user) throw createError("You must be logged in.", 401);
 };
 
 /**
  * Ensures the current user has admin privileges.
  * @param {Object} context - GraphQL context (includes user info).
- * @throws {ForbiddenError} If the user is not an admin.
+ * @throws {Error} If the user is not an admin.
  */
 const ensureAdmin = (context: any) => {
   ensureAuthenticated(context);
   if (!context.user.isAdmin)
-    throw new ForbiddenError("Admin privileges required.");
+    throw createError("Admin privileges required.", 403);
 };
 
 /**
@@ -37,20 +37,25 @@ const ensureAdmin = (context: any) => {
  * @returns {Promise<Object>} - User data without sensitive info.
  */
 export const getCurrentUser = async (context: any) => {
-  ensureAuthenticated(context);
-  return await getUserById(context.user._id);
+  try {
+    ensureAuthenticated(context);
+    return await getUserById(context.user._id);
+  } catch (error: any) {
+    throw createError(`Error fetching user: ${error.message}`, 500);
+  }
 };
 
 /**
- * Retrieves all the Users
+ * Retrieves all users (Admin-only).
+ * @param {Object} context - GraphQL context (includes user info).
+ * @returns {Promise<Array>} - Array of user objects.
  */
 export const getUsers = async (context: any) => {
   try {
     ensureAdmin(context);
-    //return await findUsers(context.user._id)
     return await User.find();
-  } catch (err) {
-    return err;
+  } catch (error: any) {
+    throw createError(`Error fetching users: ${error.message}`, 500);
   }
 };
 
@@ -66,7 +71,11 @@ export const registerUser = async (
   email: string,
   password: string
 ) => {
-  return await createUser(username, email, password);
+  try {
+    return await createUser(username, email, password);
+  } catch (error: any) {
+    throw createError(`Error registering user: ${error.message}`, 400);
+  }
 };
 
 /**
@@ -76,53 +85,58 @@ export const registerUser = async (
  * @returns {Promise<Object>} - JWT and user data.
  */
 export const authenticateUser = async (email: string, password: string) => {
-  return await loginUser(email, password);
+  try {
+    return await loginUser(email, password);
+  } catch (error: any) {
+    throw createError(`Login failed: ${error.message}`, 401);
+  }
 };
 
 /**
- * Updates a user's username and email in the database.
- * @function updateUserDetails
+ * Updates a user's username and email.
  * @param {Object} context - GraphQL context (includes user info).
  * @param {string} username - The new username.
  * @param {string} email - The new email.
- * @returns {Promise<Object>} - The updated user object.
- * @throws {Error} If the user is not found or update fails.
+ * @returns {Promise<Object>} - Updated user object.
  */
 export const updateUserDetails = async (
   context: any,
   username: string,
   email: string
 ) => {
-  ensureAuthenticated(context); // Ensure the user is logged in
+  try {
+    ensureAuthenticated(context);
+    const updatedUser = await User.findByIdAndUpdate(
+      context.user._id,
+      { username, email },
+      { new: true, runValidators: true }
+    ).select("-password -__v");
 
-  const updatedUser = await User.findByIdAndUpdate(
-    context.user._id,
-    { username, email },
-    { new: true, runValidators: true } // Return updated doc & enforce schema validation
-  ).select("-password -__v"); // Exclude sensitive fields
-
-  if (!updatedUser) {
-    throw new Error("User not found or update failed.");
+    if (!updatedUser) throw createError("User not found or update failed.", 404);
+    return updatedUser;
+  } catch (error: any) {
+    throw createError(`Error updating user details: ${error.message}`, 500);
   }
-  return updatedUser;
 };
 
 /**
- * Deletes a User and related Books from the database.
- * @function deleteUser
+ * Deletes a user (Admin-only).
+ * @param {Object} context - GraphQL context (includes user info).
+ * @param {string} userId - The ID of the user to delete.
+ * @returns {Promise<Object>} - Deleted user.
  */
 export const deleteUser = async (context: any, userId: string) => {
   try {
     ensureAdmin(context);
     return await removeUser(userId);
-  } catch (err) {
-    return err;
+  } catch (error: any) {
+    throw createError(`Error deleting user: ${error.message}`, 500);
   }
 };
 
 /**
- * Saves a book to user's library.
- * @param {Object} context - GraphQL context (user info).
+ * Saves a book to the user's library.
+ * @param {Object} context - GraphQL context (includes user info).
  * @param {Object} input - Book details.
  * @param {string} status - Reading status.
  * @returns {Promise<Object>} - Updated user data.
@@ -132,12 +146,16 @@ export const saveBook = async (
   input: any,
   status: BookStatus
 ) => {
-  ensureAuthenticated(context);
-  return await saveBookToLibrary(context.user._id, input, status);
+  try {
+    ensureAuthenticated(context);
+    return await saveBookToLibrary(context.user._id, input, status);
+  } catch (error: any) {
+    throw createError(`Error saving book: ${error.message}`, 500);
+  }
 };
 
 /**
- * Updates book status in user's library.
+ * Updates book status in the user's library.
  * @param {Object} context - GraphQL context.
  * @param {string} bookId - Book ID.
  * @param {string} status - New status.
@@ -148,50 +166,62 @@ export const updateBookStatus = async (
   bookId: string,
   status: BookStatus
 ) => {
-  ensureAuthenticated(context);
-  return await updateBookStatusInLibrary(context.user._id, bookId, status);
+  try {
+    ensureAuthenticated(context);
+    return await updateBookStatusInLibrary(context.user._id, bookId, status);
+  } catch (error: any) {
+    throw createError(`Error updating book status: ${error.message}`, 500);
+  }
 };
 
 /**
- * Removes a book from user's library.
+ * Removes a book from the user's library.
  * @param {Object} context - GraphQL context.
  * @param {string} bookId - Book ID.
  * @returns {Promise<Object>} - Updated user data.
  */
 export const removeBook = async (context: any, bookId: string) => {
-  ensureAuthenticated(context);
-  return await removeBookFromLibrary(context.user._id, bookId);
+  try {
+    ensureAuthenticated(context);
+    return await removeBookFromLibrary(context.user._id, bookId);
+  } catch (error: any) {
+    throw createError(`Error removing book: ${error.message}`, 500);
+  }
 };
 
 /**
- * Admin-only placeholder: Retrieves all users (future use).
- * @param {Object} context - GraphQL context (user info).
+ * Retrieves all users (Admin-only). Future use.
+ * @param {Object} context - GraphQL context (includes user info).
  * @returns {Promise<Array>} - Array of all user data.
- * @throws {ForbiddenError} If the user is not an admin.
  */
 export const getAllUsers = async (context: any) => {
-  ensureAdmin(context); // Only admins can use this
-  const { User } = await import("../models/index.js"); // Lazy import to avoid circular dependency
-  return await User.find({}).select("-__v -password");
+  try {
+    ensureAdmin(context);
+    const users = await User.find({}).select("-__v -password");
+    return users;
+  } catch (error: any) {
+    throw createError(`Error retrieving all users: ${error.message}`, 500);
+  }
 };
 
 /**
- * Admin-only placeholder: Promote user to admin (future use).
+ * Promotes a user to admin (Admin-only). Future use.
  * @param {Object} context - GraphQL context.
  * @param {string} userId - The ID of the user to promote.
  * @returns {Promise<Object>} - Updated user with admin privileges.
- * @throws {ForbiddenError} If the requester is not an admin.
  */
 export const promoteUserToAdmin = async (context: any, userId: string) => {
-  ensureAdmin(context); // Only admins can promote
+  try {
+    ensureAdmin(context);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isAdmin: true },
+      { new: true }
+    ).select("-__v -password");
 
-  const { User } = await import("../models/index.js");
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { isAdmin: true },
-    { new: true }
-  ).select("-__v -password");
-
-  if (!updatedUser) throw new Error("User not found.");
-  return updatedUser;
+    if (!updatedUser) throw createError("User not found.", 404);
+    return updatedUser;
+  } catch (error: any) {
+    throw createError(`Error promoting user to admin: ${error.message}`, 500);
+  }
 };
