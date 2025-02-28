@@ -9,6 +9,16 @@ import {
   createHttpLink,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import getTheme from './components/ThemeMode';
+import { createContext, useMemo, useState } from 'react';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+
+
+export const ColorModeContext = createContext<{ mode: "light" | "dark"; toggleColorMode: () => void }>({
+  mode: "light",
+  toggleColorMode: () => {},
+});
+
 
 
 const httpLink = createHttpLink({
@@ -35,6 +45,17 @@ const client = new ApolloClient({
 });
 
 function App() {
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  const colorMode = useMemo(
+    () => ({
+      mode, // Ensure mode is included in the context
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+    }),
+    [mode] // Depend on mode so it updates properly
+  );
+  
   // const [user, setUser] = useState<null | { name: string; avatar?: string }>(null);
 
   // const handleLogin = () => {
@@ -50,15 +71,17 @@ function App() {
 
   return (
     <ApolloProvider client={client}>
-      <Navbar
-        logo={logo}
-        logoSize={100}
-        links={[{ label: "Home", path: "/" }]}
-        // user={user}
-        // onLogout={handleLogout}
-        // onLogin={handleLogin}
-      />
-      <Outlet />
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={getTheme(mode)}>
+          <CssBaseline />          
+          <Navbar
+            logo={logo}
+            logoSize={100}
+            links={[{ label: "Home", path: "/" }]}
+          />
+          <Outlet />
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </ApolloProvider>
   );
 }
