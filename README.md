@@ -38,15 +38,15 @@ Click the Challenges option under Dashboard to explore the various challenges to
 
 **Search Books**
 
-    ![index](client/src/assets/images/search-books.jpg)
+![index](client/src/assets/images/search-books.jpg)
     
 **My Book Shelf**
  
-    ![index](client/src/assets/images/my-shelf.jpg)
+![index](client/src/assets/images/my-shelf.jpg)
         
 **Challenges**
 
-    ![index](client/src/assets/images/challenges.jpg)
+![index](client/src/assets/images/challenges.jpg)
       
 ## Challenges
 
