@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Grid, Box, Typography, Drawer, TextField, Button} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useQuery } from "@apollo/client";
 import { SEARCH_GOOGLE_BOOKS } from "../graphql/queries";
 import SearchBookCard from "../components/SearchBookCard";
@@ -12,23 +13,26 @@ const BookSearch: React.FC = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
 
-  // Obtener los valores actuales de la URL
+  // State to handle Drawer visibility on mobile
+  const [openDrawer, setOpenDrawer] = useState(false);
+
+  // Obtain query, author, and genre from URL
   const query = searchParams.get("query") || "";
   const author = searchParams.get("author") || "";
   const genre = searchParams.get("genre") || "";
 
-  // Estados para los filtros
+  // State to store search query, author, and genre
   const [searchQuery, setSearchQuery] = useState(query);
   const [authorQuery, setAuthorQuery] = useState(author);
   const [genreQuery, setGenreQuery] = useState(genre);
 
-  // GraphQL Query con filtros
+  // GraphQL query to search Google Books
   const { loading, error, data } = useQuery(SEARCH_GOOGLE_BOOKS, {
     variables: { query: searchQuery, author: authorQuery, genre: genreQuery },
     skip: !searchQuery,
   });
 
-  // Manejar cambios en los filtros y actualizar la URL
+  // Manages the search functionality
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchQuery) params.set("query", searchQuery);
@@ -38,20 +42,27 @@ const BookSearch: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>   
+    <Box sx={{ display: "flex" }}>
+      {/* Button to open the Drawer */}
+
+      {/* Sidebar (Drawer) */}
       <Drawer
-        variant="permanent"
+        variant="temporary" // Now always acts as a modal
+        open={openDrawer} // Controlled by state
+        onClose={() => setOpenDrawer(false)} // Close function
         sx={{
           width: drawerWidth,
-          flexShrink: 0,           
-          height: "100vh",        
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box", top: 100 }, // top: 100 to avoid overlapping with Navbar
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
       >
         <Box sx={{ padding: 3 }}>
           <Typography variant="h6">Search By</Typography>
 
-          {/* Campo de búsqueda por título */}
+          {/* Search Form */}
           <TextField
             fullWidth
             label="Title"
@@ -61,7 +72,6 @@ const BookSearch: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
 
-          {/* Campo de búsqueda por autor */}
           <TextField
             fullWidth
             label="Author"
@@ -71,7 +81,6 @@ const BookSearch: React.FC = () => {
             onChange={(e) => setAuthorQuery(e.target.value)}
           />
 
-          {/* Campo de búsqueda por género */}
           <TextField
             fullWidth
             label="Genre"
@@ -81,22 +90,29 @@ const BookSearch: React.FC = () => {
             onChange={(e) => setGenreQuery(e.target.value)}
           />
 
-          {/* Botón para aplicar los filtros */}
           <Button fullWidth variant="contained" color="primary" sx={{ marginTop: 2 }} onClick={handleSearch}>
             Apply Filters
           </Button>
         </Box>
-      </Drawer> 
+      </Drawer>
 
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, padding: 3, marginLeft: "100px" }}>
+      <Box component="main" sx={{ flexGrow: 1, padding: 3 }}>
+          <Button
+            variant="contained"
+            startIcon={<MenuIcon />}
+            sx={{ margin: 2 }}
+            onClick={() => setOpenDrawer(true)}
+          >
+            Open Search Filters
+          </Button>
         <Typography variant="h4">Search Results for "{query}"</Typography>
 
         {loading && <Typography>Loading...</Typography>}
         {error && <Typography>Error: {error.message}</Typography>}
 
         <Grid container spacing={3} sx={{ marginTop: 2 }}>
-        {data?.searchGoogleBooks?.map((book: any) => (
+          {data?.searchGoogleBooks?.map((book: any) => (
             <Grid item key={book.bookId} xs={12} sm={6} md={4} lg={3}>
               <SearchBookCard bookDetails={book} status={book.status} />
             </Grid>
