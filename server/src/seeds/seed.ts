@@ -25,7 +25,7 @@ export const seedDatabase = async () => {
 
     // Clear existing users
     await User.deleteMany({});
-    console.log("🗑️ User collection cleared");
+    console.log("User collection cleared");
 
     // Insert new user data
     await User.insertMany(hashedUsers);
