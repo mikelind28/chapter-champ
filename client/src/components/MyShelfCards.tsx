@@ -51,7 +51,6 @@ export default function MyShelfCards({
             objectFit: "contain",
             backgroundColor: "#f5f5f5",
             padding: "10px",
-            objectFit: "contain"
           }}
           image={image || "/src/assets/images/no-image.png"}
           alt={title}
