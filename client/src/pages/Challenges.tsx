@@ -15,15 +15,20 @@ export default function Challenges() {
   useEffect(() => {
     if (data) {
       setFinishedReadingCount(data.me.finishedReadingCount);
+      console.log(finishedReadingCount);
     }
   }, [data]);
 
   useEffect(() => {
     if (finishedReadingCount >= 5) {
       setFiveBookChallengeImage("https://t4.ftcdn.net/jpg/04/93/91/31/360_F_493913135_q0Ar7Aund7lRPFSxa8qg1hTQmhG5kdNP.jpg")
-    } else if (finishedReadingCount >= 10) {
+    }
+    
+    if (finishedReadingCount >= 10) {
       setTenBookChallengeImage("https://t4.ftcdn.net/jpg/04/93/91/31/360_F_493913135_q0Ar7Aund7lRPFSxa8qg1hTQmhG5kdNP.jpg")
-    } else if (finishedReadingCount >=20) {
+    }
+    
+    if (finishedReadingCount >=20) {
       setTwentyBookChallengeImage("https://t4.ftcdn.net/jpg/04/93/91/31/360_F_493913135_q0Ar7Aund7lRPFSxa8qg1hTQmhG5kdNP.jpg")
     }
   }, [finishedReadingCount])

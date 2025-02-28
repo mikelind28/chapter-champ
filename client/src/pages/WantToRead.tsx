@@ -22,6 +22,7 @@ export default function WantToRead() {
     return (
         <>
             <h2 style={{textAlign: "center"}}>Want to Read</h2>
+            {bookArray.length === 0 && <p style={{textAlign: "center"}}>No books yet!</p>}
             <div style={{display: "flex", flexWrap: "wrap", margin: 20, justifyContent: "center"}}>
                 {bookArray.length > 0 && bookArray.map((eachBook) => (
                     <SearchBookCard {...eachBook} />

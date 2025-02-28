@@ -53,7 +53,7 @@ export default function Bingo() {
     
     return (
         <>
-            {!enoughBooks && <p>Not enough books in your library to fill the bingo card! Add at least 9 books to your "Want to Read" or "Currently Reading" categories to play bingo.</p>}
+            {!enoughBooks && <p style={{textAlign: "center", margin: "20px"}}>Not enough books in your library to fill the bingo card! Add at least 9 books to your "Want to Read" or "Currently Reading" categories to play bingo.</p>}
 
             <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                 <Button variant="contained" color="secondary" style={{margin: 10}} disabled={!enoughBooks} onClick={handleShuffle}>

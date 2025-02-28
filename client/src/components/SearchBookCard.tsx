@@ -181,7 +181,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
         <CardContent>
 
           {/* Book Title */}
-          <Typography gutterBottom variant="h6" component="a" href={CardProps.bookDetails.infoLink}>
+          <Typography gutterBottom variant="h6" component="a" href={CardProps.bookDetails.infoLink} target="_blank">
 
             {CardProps.bookDetails.title}
           </Typography>
