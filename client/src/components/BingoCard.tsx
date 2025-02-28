@@ -4,6 +4,7 @@ import type { Book } from '../interfaces/Book';
 import { useEffect } from "react";
 import { Grid } from "@mui/material";
 
+// BingoCard component receives a generated bingo card prop from Bingo.tsx page
 export const BingoCard: React.FC<{ bingoCard: (Book)[][] }> = ({ bingoCard }) => {
 
     useEffect(() => {

@@ -2,6 +2,7 @@
 
 import { gql } from '@apollo/client';
 
+// retrieve a logged-in user's information
 export const GET_ME = gql`
     query me {
         me {
@@ -30,6 +31,7 @@ export const GET_ME = gql`
     }
 `;
 
+// search the Google Books API
 export const SEARCH_GOOGLE_BOOKS = gql`
     query searchGoogleBooks($query: String!) {
         searchGoogleBooks(query: $query) {
@@ -47,6 +49,7 @@ export const SEARCH_GOOGLE_BOOKS = gql`
     }
 `;
 
+// get all users feature for admin user
 export const GET_USERS = gql`
     query getUsers {
         getUsers {

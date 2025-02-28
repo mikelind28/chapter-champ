@@ -3,10 +3,11 @@ import { Grid, Typography } from '@mui/material';
 import type { Book } from '../interfaces/Book';
 import { useEffect, useState } from 'react';
 
-
+// each BingoCell component receives a book prop from BingoCard.tsx component
 export const BingoCell: React.FC<{ book: Book }> = ({ book }) => {
   const [readingStatus, setReadingStatus] = useState<Book['status']>("");
 
+  // fix formatting coming from database
   useEffect(() => {
     switch (book.status) {
       case "WANT_TO_READ":

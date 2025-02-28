@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 
+// logs in user when given correct email and password
 export const LOGIN_USER = gql`
     mutation login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
@@ -12,6 +13,7 @@ export const LOGIN_USER = gql`
     }
 `;
 
+// creates a new user upon signup
 export const ADD_USER = gql`
   mutation addUser($username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
@@ -24,6 +26,7 @@ export const ADD_USER = gql`
 }
 `;
 
+// allows a user to update their account's username and email from account page
 export const UPDATE_USER = gql`
   mutation UpdateUser($username: String!, $email: String!) {
     updateUser(username: $username, email: $email) {
@@ -34,6 +37,7 @@ export const UPDATE_USER = gql`
   }
 `;
 
+// admin users can remove existing users
 export const REMOVE_USER = gql`
   mutation RemoveUser($userId: ID!) {
     removeUser(userId: $userId) {
@@ -42,7 +46,7 @@ export const REMOVE_USER = gql`
   }
 `;
 
-
+// saves a book to a user's account
 export const SAVE_BOOK = gql`
   mutation saveBook($input: BookInput!) {
     saveBook(input: $input) {
@@ -58,6 +62,7 @@ export const SAVE_BOOK = gql`
   }
 `;
 
+// users can change the reading status of their book (finished reading, currently reading, etc.)
 export const UPDATE_BOOK_STATUS = gql`
   mutation updateBookStatus($bookId: String!, $status: ReadingStatus!) {
     updateBookStatus(bookId: $bookId, status: $status) {
@@ -73,6 +78,7 @@ export const UPDATE_BOOK_STATUS = gql`
   }
 `;
 
+// users can remove a book entirely from their shelf
 export const REMOVE_BOOK = gql`
     mutation removeBook($bookId: String!) {
     removeBook(bookId: $bookId) {

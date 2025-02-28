@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Book } from "../interfaces/Book";
 import SearchBookCard from "../components/SearchBookCard";
 
+// page to display user's "finished reading" books
 export default function FinishedReading() {
     const { loading, error, data } = useQuery(GET_ME);
     console.log(loading);
@@ -12,6 +13,7 @@ export default function FinishedReading() {
 
     const [bookArray, setBookArray] = useState<Book[]>([]);
 
+    // filter out only books with "finished reading" status and put them into bookArray
     useEffect(() => {
         if (data) {
             setBookArray(data.me.savedBooks.filter((book: Book) => book.status === "FINISHED_READING"));

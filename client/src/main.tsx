@@ -19,8 +19,6 @@ import Favorites from './pages/Favorites.tsx';
 import BookSearch from './pages/BookSearch.tsx';
 import Bingo from './pages/Bingo.tsx';
 
-
-
 const router = createBrowserRouter([
   {
     path: "/",

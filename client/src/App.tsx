@@ -13,13 +13,10 @@ import getTheme from './components/ThemeMode';
 import { createContext, useMemo, useState } from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 
-
 export const ColorModeContext = createContext<{ mode: "light" | "dark"; toggleColorMode: () => void }>({
   mode: "light",
   toggleColorMode: () => {},
 });
-
-
 
 const httpLink = createHttpLink({
   uri: '/graphql',
@@ -56,19 +53,6 @@ function App() {
     [mode] // Depend on mode so it updates properly
   );
   
-  // const [user, setUser] = useState<null | { name: string; avatar?: string }>(null);
-
-  // const handleLogin = () => {
-  //   setUser({
-  //     name: "John Doe",
-  //     avatar: "https://i.pravatar.cc/400",
-  //   });
-  // };
-
-  // const handleLogout = () => {
-  //   setUser(null);
-  // };
-
   return (
     <ApolloProvider client={client}>
       <ColorModeContext.Provider value={colorMode}>
