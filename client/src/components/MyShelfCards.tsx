@@ -12,7 +12,12 @@ interface CardProps {
   image?: string;
 }
 
-export default function MyShelfCards({ title, numbooks, image, description }: CardProps) {
+export default function MyShelfCards({ 
+  title, 
+  numbooks, 
+  image, 
+  description 
+}: CardProps) {
   const handleClick = () => {
     switch (title) {
       case "Want to Read":
@@ -23,25 +28,25 @@ export default function MyShelfCards({ title, numbooks, image, description }: Ca
         break;
       case "Finished Reading":
         window.location.assign("/finished-reading");
-        break;    
+        break;
       case "Favorites":
         window.location.assign("/favorites");
-        break;  
+        break;
       case "Complete the Bingo Challenge":
         window.location.assign("/bingo");
-        break;  
+        break;
     }
   }
 
   return (
-    <Card sx={{ maxWidth: 345 }} onClick={handleClick}>
+    <Card sx={{ maxWidth: 250, cursor: "pointer", boxShadow: 3 }} onClick={handleClick}>
       <CardActionArea>
         <CardMedia
           component="img"
-          height="140"
-          width="340"
+          height="200"
           image={image}
           alt={title}
+          sx={{ objectFit: "contain" }}
         />
 
         <CardContent>

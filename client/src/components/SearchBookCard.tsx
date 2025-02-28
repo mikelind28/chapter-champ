@@ -154,6 +154,7 @@ export default function SearchBookCard({ ...CardProps }: Book) {
         maxWidth: 300,
         cursor: "pointer",
         position: "relative",
+        margin: 1
       }}
       key={CardProps.bookDetails.bookId}
     >
