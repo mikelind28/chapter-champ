@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { createTheme, ThemeProvider, CssBaseline} from '@mui/material';
 
 import './reset.css';
 import './index.css';
@@ -20,22 +19,7 @@ import Favorites from './pages/Favorites.tsx';
 import BookSearch from './pages/BookSearch.tsx';
 import Bingo from './pages/Bingo.tsx';
 
-// Material UI Theme
-const theme = createTheme({
-  palette: {
-    mode: "light",
-    primary: {
-      main: "#293b9a",
-    },
-    secondary: {
-      main: "#4caf50",
-    },
-    background: {
-      default: "#ffffff",
-      paper: "#eaeaea",
-    },
-  },
-});
+
 
 const router = createBrowserRouter([
   {
@@ -61,11 +45,8 @@ const router = createBrowserRouter([
 const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
+    <React.StrictMode>     
+        <RouterProvider router={router} />     
     </React.StrictMode>
   );
 }
