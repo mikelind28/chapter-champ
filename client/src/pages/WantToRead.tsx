@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Book } from "../interfaces/Book";
 import SearchBookCard from '../components/SearchBookCard';
 
+// page to display user's "want to read" books
 export default function WantToRead() {
     const { loading, error, data } = useQuery(GET_ME);
     console.log(loading);
@@ -12,6 +13,7 @@ export default function WantToRead() {
 
     const [bookArray, setBookArray] = useState<Book[]>([]);
 
+    // filter out only books with "want to read" status and put them into bookArray
     useEffect(() => {
         if (data) {
             setBookArray(data.me.savedBooks.filter((book: Book) => book.status === "WANT_TO_READ"));

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { Book } from "../interfaces/Book";
 import SearchBookCard from "../components/SearchBookCard";
 
+// page to display user's "favorite" books
 export default function Favorites() {
     const { loading, error, data } = useQuery(GET_ME);
     console.log(loading);
@@ -12,6 +13,7 @@ export default function Favorites() {
 
     const [bookArray, setBookArray] = useState<Book[]>([]);
 
+    // filter out only books with "favorite" status and put them into bookArray
     useEffect(() => {
         if (data) {
             setBookArray(data.me.savedBooks.filter((book: Book) => book.status === "FAVORITE"));

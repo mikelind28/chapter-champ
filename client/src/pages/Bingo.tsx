@@ -7,26 +7,34 @@ import { Book } from "../interfaces/Book";
 import { Button } from "@mui/material";
 
 export default function Bingo() {
+    // retrieve current user's information
     const { data } = useQuery(GET_ME);
 
+    // if there are not enough books to fill a bingo card, use this boolean
     const [enoughBooks, setEnoughBooks] = useState<boolean>(false);
+
+    // bookArray will store only "Currently Reading" and "Want to Read" books for the bingo card
     const [bookArray, setBookArray] = useState<Book[]>([]);
+
+    // bingoCard is an array of arrays - three books across three columns
     const [bingoCard, setBingoCard] = useState<(Book)[][]>([]);
+
+    // only display the print feature if a bingo card has rendered
     const [displayPrint, setDisplayPrint] = useState<boolean>(false);
 
+    // populate the bookArray with the correct types of data whenever user data loads
     useEffect(() => {
         if (data) {
-            console.log(data);
             if (data.me.savedBooks.filter((book: Book) => 
                 book.status === "CURRENTLY_READING" || 
                 book.status === "WANT_TO_READ" ).length >= 9) {
                 setEnoughBooks(true);
                 setBookArray(data.me.savedBooks.filter((book: Book) => book.status === "CURRENTLY_READING" || book.status === "WANT_TO_READ" ));
             };
-            console.log("book array:", bookArray);
         }
     }, [data]);
 
+    // shuffle the bingo card when button is pushed
     const handleShuffle = () => {
         const shuffleBooks = (bookArray: Book[]) => {
             const shuffledBooks = [...bookArray].sort(() => Math.random() - 0.5);
@@ -38,15 +46,12 @@ export default function Bingo() {
             }
 
             setBingoCard([...grid]);
-
-            console.log('shuffled books:', shuffledBooks);
-            console.log('grid', grid);
-            console.log('bingo card', bingoCard);
         }
         shuffleBooks([...bookArray]);
         setDisplayPrint(true);
     }
 
+    // allow users to print their bingo card when button is pushed
     const handlePrint = () => {
         window.print();
     }
