@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 
 import type { Book } from '../interfaces/Book';
 import { useEffect, useState } from 'react';
@@ -24,7 +24,7 @@ export const BingoCell: React.FC<{ book: Book }> = ({ book }) => {
   }, [book]);
 
   return (
-    <button className={`grid-cell` } >
+    <Grid item xs={15} sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", border: "1px solid black", borderRadius: 3, height: "100%"}} fontSize={{ xs: 8, sm: 12, md: 12 }}>
           <img 
             src={book.bookDetails.thumbnail} 
             style={{height: "50%", width: "50%", objectFit: "scale-down"}}
@@ -38,11 +38,12 @@ export const BingoCell: React.FC<{ book: Book }> = ({ book }) => {
             <Typography 
               variant="body2" 
               sx={{ marginRight: 1, fontStyle: "italic" }}
+              fontSize={{ xs: 8, sm: 12, md: 12 }}
             >
               {readingStatus}
             </Typography>
           </div>
-    </button>
+    </Grid>
   );
 }
   

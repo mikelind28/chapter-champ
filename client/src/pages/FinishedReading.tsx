@@ -22,11 +22,13 @@ export default function FinishedReading() {
     return (
         <>
             <h2 style={{textAlign: "center"}}>Finished Reading:</h2>
-            {bookArray.length > 0 && bookArray.map((eachBook) => {
-                return (
-                    <SearchBookCard {...eachBook} />
-                )
-            })}
+            <div style={{display: "flex", flexWrap: "wrap", margin: 20, justifyContent: "center"}}>
+                {bookArray.length > 0 && bookArray.map((eachBook) => {
+                    return (
+                        <SearchBookCard {...eachBook} />
+                    )
+                })}
+            </div>
         </>
     );
 }
