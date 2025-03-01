@@ -6,7 +6,6 @@ import {
   saveBook,
   updateBookStatus,
   removeBook,
-  getAllUsers,
   promoteUserToAdmin,
   updateUserDetails,
   deleteUser,
@@ -45,28 +44,17 @@ const resolvers = {
     },
 
     /**
-     * Retrieves all users in the system (Admin-only). F
+     * Retrieves all users in the system ordered by Username (Admin-only).
      * @function getUsers
      * @returns {Promise<Array>} Array of user data.
      */
     getUsers: async (_parent: any, _args: any, context: Context) => {
       try {
-        return await getUsers(context);
+        //return await getUsers(context);
+        const users = await getUsers(context);
+        return users.sort(( a, b ) => a.username.localeCompare(b.username));
       } catch (error: any) {
         throw createError(`Error fetching users: ${error.message}`, 500);
-      }
-    },
-
-    /**
-     * Admin-only: Retrieves all users in the system. Future use.
-     * @function getAllUsers
-     * @returns {Promise<Array>} Array of user data.
-     */
-    getAllUsers: async (_parent: any, _args: any, context: Context) => {
-      try {
-        return await getAllUsers(context);
-      } catch (error: any) {
-        throw createError(`Error retrieving all users: ${error.message}`, 500);
       }
     },
 

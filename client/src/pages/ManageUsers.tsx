@@ -1,26 +1,33 @@
+//imports 
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_USERS } from "../graphql/queries";
 import { REMOVE_USER } from "../graphql/mutations";
 import { User } from "../interfaces/User";
 import { UserRoundX } from "lucide-react";
 
+//function to fetch users and perform delete action on the user
+
 export default function ManageUsers() {
+    //Call GET_USERS Graphql query to pull users including Admins
     const {loading,data,refetch} = useQuery(GET_USERS);
+    //Call REMOVE_USERS Graphql Mutation when a user is deleted.Since this is a Admin functionality and Users aren't going to be deleted
+    //a immediate fetch happens to refresh the list
     const [removeUser] = useMutation(REMOVE_USER,{onCompleted:() => {refetch()}});
-       
+    
+    //Checks for loading flag and prints Loading while the data is getting fetched
     if (loading)
     {
       return <div> Loading.. </div>
     }
    
-    //Delete User 
+    //Delete User functionality - A confirmation dialog is provided before deletion
     const deleteUser = (id: string) => {
       const confirmDelete = window.confirm("Are you sure you want to delete this User?");
       if (confirmDelete) {
         removeUser({variables:{userId:id}})
       }
     }
-    //console.log(data.getUsers);
+    //Display Users data and place a delete user icon using Lucide react 
     return (
       <div>
         <h1> Manage Users</h1>   

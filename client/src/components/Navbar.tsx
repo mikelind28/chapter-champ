@@ -65,6 +65,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
     console.log(user);
   }
 
+  //Call the isAdmin function to know if the user that is logged in is Admin or a Regular User
   Auth.isAdmin();
 
   return (
@@ -76,10 +77,11 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
             <MenuIcon />
           </IconButton>
         )}
-
+        
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center'}}>
           {logo && <img src={logo} alt="Logo" style={{ height: logoSize, width: "auto", marginRight: 10 }} />}
-          {!isMobile && (
+          {/* Display Search Text box and Button only for Regular Users  */}
+          {!isMobile && !Auth.isAdmin() && (
             <form onSubmit={handleSearch}>
               <TextField
                 color="secondary"
@@ -116,6 +118,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
               {link.label}
             </Button>
           ))}
+          {/* Display Menu specific to Regular Users  */}
           {!isMobile && Auth.loggedIn() && !Auth.isAdmin() && (
             <>
               <Button 
@@ -139,6 +142,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
               </Menu>
             </>
           )}
+          {/* Display Menu specific to Admin Users  */}
           {!isMobile && Auth.loggedIn() && Auth.isAdmin() && (
             <>
               <Button 
@@ -201,6 +205,7 @@ const Navbar: React.FC<NavbarProps> = ({ logo, logoSize = 50, links = [] }) => {
                 <ListItemText primary={link.label} sx={{ color: isMobile && mode === "dark" ? "#ffffff" : "inherit" }}/>
               </ListItem>
             ))}
+            {/* Display Manage Users only for Admin Users  */}
             {Auth.loggedIn() && (
               Auth.isAdmin() ? (
                 <ListItem component={Button} onClick={() => handleNavigate("/manageusers")}>
