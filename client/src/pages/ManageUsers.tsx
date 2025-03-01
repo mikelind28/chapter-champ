@@ -63,11 +63,10 @@ export default function ManageUsers() {
             <tr className="userheader">
               <th> Username </th>
               <th> Email </th>
-              <th> Current Reading </th>
               <th> Favourite Count </th>
-              <th> Finished Reading </th>
               <th> Want to Read </th>
-              <th> Book Count </th>
+              <th> Current Reading </th>
+              <th> Finished Reading </th>
               <th> Is Admin? </th>
               <th> Delete </th>
             </tr>
@@ -77,11 +76,10 @@ export default function ManageUsers() {
               <tr key={String(user._id)}>
                 <td className="userrow">{user.username}</td>
                 <td>{user.email}</td>
-                <td>{String(user.currentlyReadingCount)}</td>
                 <td>{String(user.favoriteCount)}</td>
-                <td>{String(user.finishedReadingCount)}</td>
                 <td>{String(user.wantToReadCount)}</td>
-                <td>{String(user.bookCount)}</td>
+                <td>{String(user.currentlyReadingCount)}</td>
+                <td>{String(user.finishedReadingCount)}</td>
                 <td>{ user.isAdmin ? "True" : "False" }</td>
                 <td>
                     { !user.isAdmin ? <button type='button' id='DeleteBtn' onClick ={() => deleteUser(String(user._id))}> < UserRoundX ></UserRoundX> </button> : null}
@@ -99,9 +97,7 @@ export default function ManageUsers() {
             />
       </div>
     );
-  };
-  
-      
+  };   
  
 
   
