@@ -4,7 +4,7 @@
 
 ## Description
 
-Are you tired of seeing half-finished books on your shelf? Tired of forgetting the book recommendations your friends gave you? Tired of setting New Year's resolutions to read more, only to find yourself falling behind by February? Despair no more. ChapterChamp is your all-in-one digital library that keeps track of your reading goals, favorite books, and all of your progress right in one place. With an intuitive search tool and gamified challenges, staying on top of your reading has never been easier—or more fun!Simply curate your reading list and start accomplishing your reading goals one challenge at a time.
+Are you tired of seeing half-finished books on your shelf? Tired of forgetting the book recommendations your friends gave you? Tired of setting New Year's resolutions to read more, only to find yourself falling behind by February? Despair no more. Chapter Champ is your all-in-one digital library that keeps track of your reading goals, favorite books, and all of your progress right in one place. With an intuitive search tool and gamified challenges, staying on top of your reading has never been easier—or more fun!Simply curate your reading list and start accomplishing your reading goals one challenge at a time.
 
 ## Table of Contents
 
@@ -65,7 +65,7 @@ You could provide further ideas to enhance the website, help report bugs , assis
 
 ## Credits
 
-ChapterChamp is brought to you by [Mahesh-GH24](https://github.com/Mahesh-GH24), [mikelind28](https://github.com/mikelind28), [Sinnema1](https://github.com/Sinnema1), and [xfigueroa](https://github.com/xfigueroa).
+Chapter Champ is brought to you by [Mahesh-GH24](https://github.com/Mahesh-GH24), [mikelind28](https://github.com/mikelind28), [Sinnema1](https://github.com/Sinnema1), and [xfigueroa](https://github.com/xfigueroa).
 
 ## License
 

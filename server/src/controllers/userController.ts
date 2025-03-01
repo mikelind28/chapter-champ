@@ -46,14 +46,14 @@ export const getCurrentUser = async (context: any) => {
 };
 
 /**
- * Retrieves all users (Admin-only).
+ * Retrieves all users ordered by Username ASC (Admin-only).
  * @param {Object} context - GraphQL context (includes user info).
  * @returns {Promise<Array>} - Array of user objects.
  */
 export const getUsers = async (context: any) => {
   try {
     ensureAdmin(context);
-    return await User.find();
+    return await User.find({}).select("-__v -password");
   } catch (error: any) {
     throw createError(`Error fetching users: ${error.message}`, 500);
   }
@@ -186,21 +186,6 @@ export const removeBook = async (context: any, bookId: string) => {
     return await removeBookFromLibrary(context.user._id, bookId);
   } catch (error: any) {
     throw createError(`Error removing book: ${error.message}`, 500);
-  }
-};
-
-/**
- * Retrieves all users (Admin-only). Future use.
- * @param {Object} context - GraphQL context (includes user info).
- * @returns {Promise<Array>} - Array of all user data.
- */
-export const getAllUsers = async (context: any) => {
-  try {
-    ensureAdmin(context);
-    const users = await User.find({}).select("-__v -password");
-    return users;
-  } catch (error: any) {
-    throw createError(`Error retrieving all users: ${error.message}`, 500);
   }
 };
 

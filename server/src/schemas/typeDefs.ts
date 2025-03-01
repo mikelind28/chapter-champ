@@ -86,7 +86,7 @@ const typeDefs = gql`
     # Retrieves a user by ID or username
     getSingleUser(id: ID, username: String): User
 
-    # Retrieves all users
+    # Admin-Only - Retrieves all users ordered by Username
     getUsers: [User]!
 
     # Search Google Books API with all specified response fields
@@ -94,9 +94,6 @@ const typeDefs = gql`
 
     # Get Google Books by ID
     getGoogleBookById(volumeId: String!): BookDetails
-
-    # Admin-Only: Fetch all users
-    getAllUsers: [User]!
   }
 
   """
